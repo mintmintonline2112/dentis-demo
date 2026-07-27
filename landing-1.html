@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSD — Studio of Smile Design</title>
+<!-- đánh dấu có JS + áp theme đã lưu NGAY để tránh nháy (FOUC) -->
+<script>
+  document.documentElement.classList.add("has-js");
+  try {
+    var _t = localStorage.getItem("ssd-theme");
+    if (_t === "light") document.documentElement.setAttribute("data-theme", "light");
+    var _p = localStorage.getItem("ssd-menu-pos");           // vị trí menu mobile đã lưu
+    document.documentElement.setAttribute("data-pos", _p === "center" || _p === "right" ? _p : "left");
+  } catch (e) { document.documentElement.setAttribute("data-pos", "left"); }
+</script>
+<link href="assets/fonts/fonts.css" rel="stylesheet" />
+<style>
+  :root{
+    /* ----- Dark mode (mặc định) ----- */
+    --bg:#0b0b0d;
+    --fg:#e9e9ea;
+    --muted:#8a8a8f;
+    --accent:#d9d9dc;
+    --line:rgba(255,255,255,.14);
+    --card-hover:#131316;
+    --hero-base:#050506;
+    --hero-filter:grayscale(.4) contrast(1.03) brightness(.92);
+    /* lớp phủ hero (đậm tối, bảo vệ chữ trắng) */
+    --scrim:
+      radial-gradient(135% 120% at 0% 100%, rgba(0,0,0,.92) 0%, rgba(0,0,0,.45) 30%, transparent 56%),
+      radial-gradient(70% 48% at 50% 0%, rgba(0,0,0,.55), transparent 62%),
+      linear-gradient(180deg, rgba(6,6,9,.60) 0%, rgba(6,6,9,.26) 40%, rgba(11,11,13,.86) 100%);
+
+    --radius-arc: 92px;           /* khoảng cách từ tâm mặt số tới chữ */
+    --pivot-x: 78px;              /* vị trí tâm mặt số theo trục X */
+    --pivot-y: 96px;              /* vị trí tâm mặt số theo trục Y (tính từ đáy) */
+  }
+  /* ----- Light mode ----- */
+  html[data-theme="light"]{
+    --bg:#f4f4f5;
+    --fg:#17171a;
+    --muted:#5f5f66;
+    --accent:#2a2a30;
+    --line:rgba(0,0,0,.14);
+    --card-hover:#e9e9ec;
+    --hero-base:#dfe1e4;
+    --hero-filter:grayscale(.1) contrast(1.02) brightness(1.03);
+    /* lớp phủ hero (sáng, để chữ tối đọc được trên ảnh) */
+    --scrim:
+      radial-gradient(135% 120% at 0% 100%, rgba(255,255,255,.94) 0%, rgba(255,255,255,.55) 30%, transparent 58%),
+      radial-gradient(70% 48% at 50% 0%, rgba(255,255,255,.45), transparent 62%),
+      linear-gradient(180deg, rgba(244,244,245,.30) 0%, rgba(244,244,245,.08) 40%, rgba(244,244,245,.80) 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Barlow",system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    overflow:hidden;               /* SPA: không cuộn trang, nội dung mở dạng panel */
+    height:100vh;
+    transition:background-color .45s ease, color .45s ease;
+  }
+
+  /* ============ HERO ============ */
+  .hero{
+    position:relative;
+    height:100vh;
+    min-height:640px;
+    width:100%;
+    overflow:hidden;
+    /* ảnh nền phòng khám + filter đổi theo theme */
+    background:var(--hero-base) url("images/background2.png") center 34% / cover no-repeat;
+    filter:var(--hero-filter);
+    transition:filter .45s ease;
+  }
+  /* lớp phủ hero đổi theo theme (tối cho dark, sáng cho light) */
+  .hero::before{
+    content:"";
+    position:absolute;inset:0;
+    background:var(--scrim);
+    transition:background .45s ease;
+  }
+  /* lớp hạt nhiễu nhẹ cho có texture */
+  .hero::after{
+    content:"";position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* ============ LOGO (thanh dọc như equalizer) ============ */
+  .brand{
+    position:fixed;top:26px;left:30px;z-index:40;
+    display:flex;align-items:flex-end;gap:4px;height:44px;
+    text-decoration:none;
+  }
+  .brand span{width:4px;background:var(--fg);border-radius:1px;animation:eq 1.6s ease-in-out infinite}
+  .brand span:nth-child(1){height:60%;animation-delay:0s}
+  .brand span:nth-child(2){height:100%;animation-delay:.15s}
+  .brand span:nth-child(3){height:44%;animation-delay:.3s}
+  .brand span:nth-child(4){height:78%;animation-delay:.45s}
+  .brand span:nth-child(5){height:30%;animation-delay:.6s}
+  @keyframes eq{0%,100%{transform:scaleY(.7)}50%{transform:scaleY(1)}}
+
+  /* ============ Nút Dark/Light góc phải ============ */
+  .theme-toggle{
+    position:fixed;top:26px;right:32px;z-index:40;
+    width:30px;height:30px;padding:0;
+    background:none;border:none;color:var(--fg);cursor:pointer;
+    opacity:.8;transition:opacity .3s, transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .theme-toggle:hover{opacity:1;transform:rotate(20deg)}
+  .theme-toggle svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s, transform .45s}
+  /* mặc định (Dark) hiện mặt trăng, ẩn mặt trời */
+  .theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
+  .theme-toggle .icon-moon{opacity:1;transform:none}
+  html[data-theme="light"] .theme-toggle .icon-sun{opacity:1;transform:none}
+  html[data-theme="light"] .theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
+
+  /* ============ Nút Lưu vị trí (đĩa mềm) — chỉ mobile ============ */
+  .save-btn{
+    position:fixed;top:26px;right:26px;z-index:41;display:none;
+    width:30px;height:30px;padding:0;align-items:center;justify-content:center;
+    background:none;border:none;color:var(--fg);cursor:pointer;opacity:.8;
+    transition:opacity .3s, transform .3s;
+  }
+  .save-btn:hover,.save-btn:active{opacity:1;transform:scale(.92)}
+  .save-btn svg{width:22px;height:22px}
+  /* đang ở chế độ chọn vị trí → nút Save nhấp nháy nhắc "bấm để lưu" */
+  html.pos-editing .save-btn{opacity:1;animation:savePulse 1.4s ease-in-out infinite}
+  @keyframes savePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.16)}}
+
+  /* ============ 3 điểm chọn vị trí menu (mobile) ============ */
+  .pos-picker{display:none}
+  .pos-dot{
+    position:fixed;z-index:37;width:56px;height:56px;padding:0;
+    bottom:calc(var(--pivot-y) - 28px);
+    border:1.5px dashed var(--fg);border-radius:50%;
+    background:color-mix(in srgb, var(--bg) 55%, transparent);
+    color:var(--fg);cursor:pointer;opacity:.5;
+    display:grid;place-items:center;
+    transition:opacity .3s, transform .3s, border-color .3s, background-color .3s;
+    -webkit-tap-highlight-color:transparent;
+    animation:posPulse 2.4s ease-out infinite;
+  }
+  .pos-dot::before{content:"+";font-family:"Barlow Condensed";font-size:22px;line-height:1;opacity:.8}
+  .pos-dot:hover,.pos-dot:active{opacity:1;transform:scale(1.08);border-style:solid}
+  .pos-dot.left{left:calc(60px - 28px)}
+  .pos-dot.center{left:calc(50vw - 28px)}
+  .pos-dot.right{right:calc(60px - 28px)}
+  /* điểm đang chọn: ẩn đi (vì menu đang nằm đó) */
+  html[data-pos="left"]   .pos-dot.left,
+  html[data-pos="center"] .pos-dot.center,
+  html[data-pos="right"]  .pos-dot.right{opacity:0;pointer-events:none;animation:none;transform:scale(.6)}
+  @keyframes posPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--fg) 30%, transparent)}70%,100%{box-shadow:0 0 0 12px transparent}}
+
+  /* toast "đã lưu" */
+  .toast{
+    position:fixed;left:50%;bottom:120px;z-index:80;
+    transform:translateX(-50%) translateY(12px);
+    background:var(--fg);color:var(--bg);
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.14em;font-size:12px;
+    padding:9px 18px;border-radius:30px;opacity:0;pointer-events:none;
+    transition:opacity .35s ease, transform .35s cubic-bezier(.2,.7,.2,1);
+    white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ============ MENU VÒNG CUNG (điểm nhấn) ============ */
+  .dial{
+    position:fixed;left:0;right:0;bottom:0;z-index:35;
+    height:220px;pointer-events:none;
+  }
+  /* mặt số / ống kính tròn ở góc */
+  .dial-lens{
+    position:absolute;
+    left:calc(var(--pivot-x) - 62px);
+    bottom:calc(var(--pivot-y) - 62px);
+    width:124px;height:124px;border-radius:50%;
+    pointer-events:auto;          /* để kéo xoay được */
+    cursor:grab;touch-action:none;
+    color:var(--fg);              /* mặt số đổi màu theo theme */
+    transition:left .45s cubic-bezier(.2,.7,.2,1), right .45s cubic-bezier(.2,.7,.2,1);
+  }
+  html.dial-dragging .dial-lens{cursor:grabbing}
+  html.dial-dragging .spoke{transition:none}
+  html.dial-dragging .spoke,html.dial-dragging .dial-lens{will-change:transform}
+  .dial-lens svg{width:100%;height:100%;display:block}
+  /* Xoay bằng SMIL <animateTransform> ngay trong SVG (xem markup bên dưới) */
+
+  /* các nan menu toả ra từ tâm */
+  .arc{position:fixed;left:0;right:0;bottom:0;z-index:36;height:0}
+  .spoke{
+    position:absolute;
+    left:var(--pivot-x);
+    bottom:var(--pivot-y);
+    transform-origin:left center;
+    transform:rotate(var(--deg));
+    white-space:nowrap;
+    transition:left .45s cubic-bezier(.2,.7,.2,1), right .45s cubic-bezier(.2,.7,.2,1);
+  }
+  .spoke a{
+    display:inline-block;
+    padding-left:var(--radius-arc);
+    font-family:"Barlow Condensed",sans-serif;
+    font-weight:500;
+    font-size:15px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    text-decoration:none;
+    transition:color .3s ease, padding-left .35s cubic-bezier(.2,.7,.2,1);
+  }
+  .spoke a:hover{color:var(--fg);padding-left:calc(var(--radius-arc) + 12px)}
+  /* chấm nhỏ đầu mỗi nan */
+  .spoke a::before{
+    content:"";position:absolute;left:calc(var(--radius-arc) - 14px);top:50%;
+    width:4px;height:4px;border-radius:50%;background:var(--muted);
+    transform:translateY(-50%) scale(.6);opacity:.5;transition:.3s;
+  }
+  .spoke a:hover::before{background:var(--fg);opacity:1;transform:translateY(-50%) scale(1)}
+
+  /* ============ PANEL nội dung (ẩn sẵn, click menu mới hiện) ============ */
+  .panel{
+    position:fixed;inset:0;z-index:25;
+    overflow-y:auto;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:120px clamp(30px,8vw,140px) 170px;
+    background:var(--bg);
+    opacity:0;visibility:hidden;transform:translateY(26px);
+    transition:opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1), visibility .55s, background-color .45s ease;
+  }
+  .panel.active{opacity:1;visibility:visible;transform:none}
+  .panel h2{
+    font-family:"Barlow Condensed",sans-serif;font-weight:600;
+    font-size:clamp(38px,6vw,88px);letter-spacing:.02em;text-transform:uppercase;line-height:1;
+  }
+  .panel p{max-width:620px;margin-top:22px;color:var(--muted);font-size:18px;line-height:1.7}
+
+  /* panel nhiều nội dung → canh từ trên xuống để không bị cắt đầu khi cuộn */
+  #kienthuc.panel{justify-content:flex-start}
+
+  /* ============ Blog / Kiến thức: danh sách bài viết ============ */
+  .blog-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));
+    gap:24px;margin-top:56px;max-width:1240px;
+  }
+  .post{
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg);
+    display:flex;flex-direction:column;
+    transition:transform .4s cubic-bezier(.2,.7,.2,1), border-color .3s, background-color .3s;
+  }
+  .post:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--fg) 35%,transparent);background:var(--card-hover)}
+  .post-thumb{
+    position:relative;aspect-ratio:16/10;display:grid;place-items:center;color:var(--fg);
+    background:
+      radial-gradient(120% 130% at 18% 0%, color-mix(in srgb,var(--fg) 12%,transparent), transparent 62%),
+      var(--card-hover);
+    overflow:hidden;
+  }
+  /* lưới hạt mờ cho thumbnail có texture */
+  .post-thumb::after{
+    content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background-image:radial-gradient(color-mix(in srgb,var(--fg) 22%,transparent) 1px,transparent 1.4px);
+    background-size:16px 16px;
+    -webkit-mask-image:radial-gradient(120% 100% at 80% 10%,#000,transparent 70%);
+            mask-image:radial-gradient(120% 100% at 80% 10%,#000,transparent 70%);
+  }
+  .post-thumb svg{width:64px;height:64px;opacity:.85;position:relative;z-index:1;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .post:hover .post-thumb svg{transform:scale(1.12) rotate(-4deg)}
+  .post-cat{
+    position:absolute;top:12px;left:12px;z-index:2;
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.16em;font-size:10.5px;
+    padding:5px 10px;border:1px solid color-mix(in srgb,var(--fg) 30%,transparent);border-radius:20px;
+    background:color-mix(in srgb,var(--bg) 55%,transparent);
+  }
+  .post-body{padding:22px 22px 24px;display:flex;flex-direction:column;flex:1}
+  .post-meta{display:flex;gap:14px;align-items:center;font-family:"Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;font-size:11px;color:var(--muted)}
+  .post-meta .d{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+  .post h3{
+    font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;
+    font-size:21px;letter-spacing:.02em;line-height:1.15;margin:12px 0 10px;color:var(--fg);
+  }
+  .post-desc{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0}
+  .post .more{
+    margin-top:18px;display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:var(--fg);
+    border-bottom:1px solid var(--line);padding-bottom:4px;transition:gap .3s,border-color .3s;
+  }
+  .post .more:hover{gap:14px;border-color:var(--fg)}
+
+  /* ---- Phân trang (giả định, dùng div/span) ---- */
+  .pagination{display:flex;align-items:center;gap:10px;margin-top:52px;flex-wrap:wrap}
+  .pagination span{
+    display:inline-grid;place-items:center;min-width:42px;height:42px;padding:0 12px;
+    border:1px solid var(--line);border-radius:11px;
+    font-family:"Barlow Condensed";font-size:15px;letter-spacing:.05em;color:var(--muted);
+    cursor:pointer;user-select:none;transition:color .3s,border-color .3s,background-color .3s;
+  }
+  .pagination span:hover{border-color:var(--fg);color:var(--fg)}
+  .pagination .pg-num.active{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+  .pagination .pg-dots{border-color:transparent;cursor:default;min-width:22px;padding:0}
+  .pagination .pg-dots:hover{color:var(--muted);border-color:transparent}
+  .pagination .pg-btn{font-size:17px;gap:0}
+  .pagination .pg-btn.disabled{opacity:.35;cursor:not-allowed}
+  .pagination .pg-btn.disabled:hover{border-color:var(--line);color:var(--muted)}
+
+  /* nút đóng panel (hiện khi có panel mở) */
+  .panel-close{
+    position:fixed;top:26px;right:26px;z-index:45;
+    display:flex;align-items:center;gap:9px;
+    background:none;border:none;color:var(--fg);cursor:pointer;
+    font-family:"Barlow Condensed",sans-serif;font-size:14px;letter-spacing:.2em;text-transform:uppercase;
+    opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s,color .3s,visibility .4s;
+  }
+  .panel-close .x{position:relative;width:16px;height:16px}
+  .panel-close .x::before,.panel-close .x::after{content:"";position:absolute;top:50%;left:0;width:100%;height:1.5px;background:currentColor}
+  .panel-close .x::before{transform:rotate(45deg)}
+  .panel-close .x::after{transform:rotate(-45deg)}
+  html.panel-open .panel-close{opacity:1;visibility:visible;pointer-events:auto}
+  html.panel-open .panel-close:hover{opacity:.7}
+  /* dùng !important vì GSAP set opacity inline lên các nút này */
+  html.panel-open .theme-toggle{opacity:0 !important;pointer-events:none}
+  /* mở panel → ẩn Save + điểm chọn vị trí, chỉ chừa nút Đóng cho gọn */
+  html.panel-open .save-btn{opacity:0 !important;pointer-events:none}
+  html.panel-open .pos-picker{display:none}
+  /* mở panel → ẩn menu vòng cung + mặt số cho đọc nội dung gọn (đóng lại menu hiện lại) */
+  html.panel-open .dial,
+  html.panel-open .arc{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease, visibility .35s}
+
+  /* mục menu đang chọn */
+  .spoke a.current{color:var(--fg)}
+  .spoke a.current::before{background:var(--fg);opacity:1;transform:translateY(-50%) scale(1)}
+  .kicker{color:var(--muted);letter-spacing:.35em;text-transform:uppercase;font-size:12px;margin-bottom:18px;font-family:"Barlow Condensed",sans-serif}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin-top:50px}
+  .card{border:1px solid var(--line);padding:30px 26px;transition:.35s}
+  .card:hover{background:var(--card-hover);transform:translateY(-4px)}
+  .card h3{font-family:"Barlow Condensed",sans-serif;font-weight:500;font-size:22px;letter-spacing:.05em;text-transform:uppercase}
+  .card p{margin-top:10px;font-size:15px}
+
+  .contact-row{display:flex;flex-wrap:wrap;gap:40px;margin-top:40px}
+  .contact-row a{color:var(--fg);text-decoration:none;font-size:20px;border-bottom:1px solid var(--line);padding-bottom:6px;transition:.3s}
+  .contact-row a:hover{border-color:var(--fg)}
+
+  /* dòng bản quyền nhỏ ở đáy panel */
+  .panel .copy{margin-top:60px;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+
+  /* ============ Trạng thái ban đầu cho GSAP (chỉ khi có JS) ============ */
+  .has-js .spoke,
+  .has-js .dial-lens,
+  .has-js .brand,
+  .has-js .theme-toggle{opacity:0}
+  .has-js .panel .reveal{opacity:0}
+  /* tôn trọng người tắt hiệu ứng */
+  @media (prefers-reduced-motion: reduce){
+    .has-js .spoke,.has-js .dial-lens,.has-js .brand,
+    .has-js .theme-toggle,.has-js .panel .reveal{opacity:1}
+    .dial-lens .rot,.dial-lens .rot-rev,.dial-lens .arc-spin,.dial-lens .arc-spin2,.brand span{animation:none}
+  }
+
+  /* ============ Responsive ============ */
+  @media (max-width:640px){
+    :root{--radius-arc:76px;--pivot-x:60px;--pivot-y:74px}
+    .spoke a{font-size:12px;letter-spacing:.1em}
+    .dial-lens{width:96px;height:96px;left:calc(var(--pivot-x) - 48px);bottom:calc(var(--pivot-y) - 48px)}
+
+    /* ====== 3 VỊ TRÍ MENU: bấm Save để bật chọn, bấm điểm, bấm Save để lưu ====== */
+    .save-btn{display:flex}
+    .theme-toggle{right:64px}
+    html.pos-editing .pos-picker{display:block}   /* chỉ hiện khi đang chọn */
+
+    /* GIỮA-DƯỚI: dời tâm ra giữa, fan vẫn hướng lên-phải */
+    html[data-pos="center"]{--pivot-x:50vw}
+
+    /* DƯỚI-PHẢI: neo từ mép phải + lật fan sang trái */
+    html[data-pos="right"] .dial-lens{left:auto;right:calc(var(--pivot-x) - 48px)}
+    html[data-pos="right"] .spoke{left:auto;right:var(--pivot-x);transform-origin:right center;transform:rotate(calc(-1 * var(--deg)))}
+    html[data-pos="right"] .spoke a{padding-left:0;padding-right:var(--radius-arc)}
+    html[data-pos="right"] .spoke a::before{left:auto;right:calc(var(--radius-arc) - 14px)}
+    html[data-pos="right"] .spoke a:hover{padding-left:0;padding-right:calc(var(--radius-arc) + 12px)}
+  }
+</style>
+</head>
+<body>
+
+  <!-- LOGO -->
+  <a class="brand" href="#home" aria-label="SSD - Studio of Smile Design">
+    <span></span><span></span><span></span><span></span><span></span>
+  </a>
+
+  <!-- Nút chuyển Dark / Light -->
+  <button class="theme-toggle" type="button" aria-label="Chuyển chế độ sáng/tối" title="Chế độ sáng/tối">
+    <!-- mặt trăng: hiện khi đang Dark (bấm để sang Light) -->
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+    </svg>
+    <!-- mặt trời: hiện khi đang Light (bấm để sang Dark) -->
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.2"/>
+      <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>
+    </svg>
+  </button>
+
+  <!-- Nút Lưu vị trí menu (mobile) -->
+  <button class="save-btn" type="button" aria-label="Lưu vị trí menu" title="Lưu vị trí menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+      <path d="M17 21v-8H7v8M7 3v5h8"/>
+    </svg>
+  </button>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Đã lưu vị trí menu</div>
+
+  <!-- 3 điểm chọn vị trí menu (mobile): bấm chọn rồi bấm Save -->
+  <div class="pos-picker">
+    <button class="pos-dot left"   type="button" data-pos="left"   aria-label="Đặt menu ở góc dưới-trái"></button>
+    <button class="pos-dot center" type="button" data-pos="center" aria-label="Đặt menu ở giữa-dưới"></button>
+    <button class="pos-dot right"  type="button" data-pos="right"  aria-label="Đặt menu ở góc dưới-phải"></button>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero" id="home"></header>
+
+  <!-- MẶT SỐ / ỐNG KÍNH -->
+  <div class="dial" aria-hidden="true">
+    <div class="dial-lens">
+      <svg viewBox="0 0 124 124" fill="none" stroke="currentColor">
+        <circle cx="62" cy="62" r="61" stroke-opacity=".14"/>
+        <circle cx="62" cy="62" r="46" stroke-opacity=".22"/>
+        <g class="rot">
+          <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 62 62" to="360 62 62" dur="11s" repeatCount="indefinite"/>
+          <!-- vạch chia quanh vòng -->
+          <g stroke-opacity=".42" stroke-width="1">
+            <line x1="62" y1="4"  x2="62" y2="12"/>
+            <line x1="62" y1="112" x2="62" y2="120"/>
+            <line x1="4"  y1="62" x2="12" y2="62"/>
+            <line x1="112" y1="62" x2="120" y2="62"/>
+            <line x1="21" y1="21" x2="27" y2="27"/>
+            <line x1="97" y1="97" x2="103" y2="103"/>
+            <line x1="21" y1="103" x2="27" y2="97"/>
+            <line x1="97" y1="27" x2="103" y2="21"/>
+          </g>
+        </g>
+        <g class="rot-rev">
+          <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="360 62 62" to="0 62 62" dur="17s" repeatCount="indefinite"/>
+          <circle cx="62" cy="62" r="30" stroke-opacity=".18" stroke-dasharray="3 6"/>
+        </g>
+        <!-- vòng cung sáng xoay tròn (thấy rõ chuyển động) -->
+        <g class="arc-spin">
+          <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 62 62" to="360 62 62" dur="3.6s" repeatCount="indefinite"/>
+          <circle cx="62" cy="62" r="53" stroke-width="2" stroke-linecap="round"
+                  stroke-opacity=".9" pathLength="100" stroke-dasharray="26 74"/>
+        </g>
+        <g class="arc-spin2">
+          <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="360 62 62" to="0 62 62" dur="6s" repeatCount="indefinite"/>
+          <circle cx="62" cy="62" r="38" stroke-width="1.5" stroke-linecap="round"
+                  stroke-opacity=".55" pathLength="100" stroke-dasharray="14 86"/>
+        </g>
+        <circle cx="62" cy="62" r="6" fill="currentColor" stroke="none" fill-opacity=".9"/>
+        <circle cx="62" cy="62" r="14" stroke-opacity=".45"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- MENU VÒNG CUNG -->
+  <nav class="arc" id="mainmenu" aria-label="Menu chính">
+    <div class="spoke" style="--deg:-60deg"><a href="#dichvu">Dịch vụ</a></div>
+    <div class="spoke" style="--deg:-48deg"><a href="#doingu">Đội ngũ SSD</a></div>
+    <div class="spoke" style="--deg:-36deg"><a href="#thuvien">Thư viện ảnh</a></div>
+    <div class="spoke" style="--deg:-24deg"><a href="#kienthuc">Kiến thức nha khoa</a></div>
+    <div class="spoke" style="--deg:-12deg"><a href="#dathen">Đặt hẹn khám</a></div>
+    <div class="spoke" style="--deg:-1deg"><a href="#lienhe">Liên hệ</a></div>
+  </nav>
+
+  <!-- ===== Các mục nội dung ===== -->
+  <section class="panel" id="dichvu">
+    <p class="kicker reveal">01 — Dịch vụ</p>
+    <h2 class="reveal">Nha khoa thẩm mỹ<br/>chuẩn Studio</h2>
+    <p class="reveal">Thiết kế nụ cười cá nhân hoá, tối giản mà tinh tế — nơi từng chi tiết được chăm chút như một tác phẩm.</p>
+    <div class="cards">
+      <div class="card reveal"><h3>Bọc răng sứ</h3><p>Phục hình thẩm mỹ, màu sắc tự nhiên.</p></div>
+      <div class="card reveal"><h3>Niềng răng</h3><p>Chỉnh nha trong suốt & mắc cài.</p></div>
+      <div class="card reveal"><h3>Implant</h3><p>Trồng răng cố định, bền vững.</p></div>
+      <div class="card reveal"><h3>Tẩy trắng</h3><p>Làm sáng răng an toàn.</p></div>
+    </div>
+  </section>
+
+  <section class="panel" id="doingu">
+    <p class="kicker reveal">02 — Đội ngũ SSD</p>
+    <h2 class="reveal">Studio of<br/>Smile Design</h2>
+    <p class="reveal">Đội ngũ bác sĩ giàu kinh nghiệm, tận tâm với triết lý "mỗi nụ cười là một thiết kế riêng".</p>
+  </section>
+
+  <section class="panel" id="thuvien">
+    <p class="kicker reveal">03 — Thư viện ảnh</p>
+    <h2 class="reveal">Trước &amp; Sau</h2>
+    <p class="reveal">Bộ sưu tập những ca điều trị thực tế, minh chứng cho sự thay đổi tự nhiên và hài hoà.</p>
+  </section>
+
+  <section class="panel" id="kienthuc">
+    <p class="kicker reveal">04 — Kiến thức nha khoa</p>
+    <h2 class="reveal">Blog &amp; Cẩm nang</h2>
+    <p class="reveal">Chia sẻ kiến thức chăm sóc răng miệng, xu hướng nha khoa hiện đại và lời khuyên từ chuyên gia.</p>
+
+    <div class="blog-grid">
+      <!-- Bài 1 -->
+      <article class="post reveal">
+        <div class="post-thumb">
+          <span class="post-cat">Chăm sóc</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 9c-6 0-10 4-10 11 0 6 2 9 3 16 1 6 2 14 4 18 1 2 4 2 5 0 2-5 2-12 5-12s3 7 5 12c1 2 4 2 5 0 2-4 3-12 4-18 1-7 3-10 3-16 0-7-4-11-10-11-4 0-6 2-9 2s-5-2-9-2z"/>
+            <path d="M24 21c2-1.5 6-1.5 8 0" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="post-body">
+          <div class="post-meta"><span>12 · 07 · 2026</span><span class="d"></span><span>5 phút đọc</span></div>
+          <h3>5 thói quen giữ răng chắc khoẻ mỗi ngày</h3>
+          <p class="post-desc">Những nguyên tắc chải răng, dùng chỉ nha khoa và chế độ ăn giúp men răng bền đẹp theo thời gian.</p>
+          <a class="more" href="#kienthuc">Đọc tiếp →</a>
+        </div>
+      </article>
+
+      <!-- Bài 2 -->
+      <article class="post reveal">
+        <div class="post-thumb">
+          <span class="post-cat">Chỉnh nha</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 26h44M10 38h44"/>
+            <path d="M18 26v12M28 26v12M36 26v12M46 26v12"/>
+            <circle cx="18" cy="32" r="2.4"/><circle cx="28" cy="32" r="2.4"/><circle cx="36" cy="32" r="2.4"/><circle cx="46" cy="32" r="2.4"/>
+          </svg>
+        </div>
+        <div class="post-body">
+          <div class="post-meta"><span>05 · 07 · 2026</span><span class="d"></span><span>6 phút đọc</span></div>
+          <h3>Niềng răng trong suốt có thật sự "vô hình"?</h3>
+          <p class="post-desc">So sánh khay trong suốt và mắc cài truyền thống — ưu nhược điểm, thời gian và chi phí cần cân nhắc.</p>
+          <a class="more" href="#kienthuc">Đọc tiếp →</a>
+        </div>
+      </article>
+
+      <!-- Bài 3 -->
+      <article class="post reveal">
+        <div class="post-thumb">
+          <span class="post-cat">Thẩm mỹ</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M32 12l3.4 7.8L43 23l-7.6 3.2L32 34l-3.4-7.8L21 23l7.6-3.2z"/>
+            <path d="M46 40l1.6 3.6L51 45l-3.4 1.4L46 50l-1.6-3.6L41 45l3.4-1.4z" opacity=".7"/>
+            <path d="M17 42l1.3 3 3 1.3-3 1.3L17 51l-1.3-3-3-1.3 3-1.3z" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="post-body">
+          <div class="post-meta"><span>28 · 06 · 2026</span><span class="d"></span><span>4 phút đọc</span></div>
+          <h3>Tẩy trắng răng: an toàn tới đâu?</h3>
+          <p class="post-desc">Cơ chế tẩy trắng, mức độ ê buốt và cách duy trì hàm răng sáng lâu dài mà không hại men.</p>
+          <a class="more" href="#kienthuc">Đọc tiếp →</a>
+        </div>
+      </article>
+
+      <!-- Bài 4 -->
+      <article class="post reveal">
+        <div class="post-thumb">
+          <span class="post-cat">Phục hình</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M32 8c5 0 8 3 8 8 0 3-1 5-2 7H26c-1-2-2-4-2-7 0-5 3-8 8-8z"/>
+            <path d="M26 23h12M27 29h10M28 35h8M30 41h4M31 47l1 8 1-8"/>
+          </svg>
+        </div>
+        <div class="post-body">
+          <div class="post-meta"><span>19 · 06 · 2026</span><span class="d"></span><span>7 phút đọc</span></div>
+          <h3>Implant — giải pháp cho răng đã mất</h3>
+          <p class="post-desc">Quy trình cấy ghép, điều kiện xương hàm và vì sao implant được xem là "chân răng thứ hai".</p>
+          <a class="more" href="#kienthuc">Đọc tiếp →</a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Phân trang (giả định — mốt gắn JS) -->
+    <div class="pagination reveal" role="navigation" aria-label="Phân trang">
+      <span class="pg-btn pg-prev disabled" aria-label="Trang trước">←</span>
+      <span class="pg-num active">1</span>
+      <span class="pg-num">2</span>
+      <span class="pg-num">3</span>
+      <span class="pg-dots">…</span>
+      <span class="pg-num">8</span>
+      <span class="pg-btn pg-next" aria-label="Trang sau">→</span>
+    </div>
+  </section>
+
+  <section class="panel" id="dathen">
+    <p class="kicker reveal">05 — Đặt hẹn khám</p>
+    <h2 class="reveal">Đặt lịch<br/>tư vấn miễn phí</h2>
+    <p class="reveal">Chọn thời gian phù hợp, đội ngũ SSD sẽ liên hệ xác nhận trong thời gian sớm nhất.</p>
+    <div class="contact-row reveal"><a href="tel:+84000000000">Gọi đặt lịch →</a><a href="#lienhe">Gửi yêu cầu →</a></div>
+  </section>
+
+  <section class="panel" id="lienhe">
+    <p class="kicker reveal">06 — Liên hệ</p>
+    <h2 class="reveal">Kết nối<br/>với chúng tôi</h2>
+    <div class="contact-row reveal">
+      <a href="mailto:hello@nhakhoassd.com">hello@nhakhoassd.com</a>
+      <a href="tel:+84000000000">+84 000 000 000</a>
+      <a href="#home">nhakhoassd.com</a>
+    </div>
+    <p class="copy reveal">© 2026 SSD — Studio of Smile Design. All rights reserved.</p>
+  </section>
+
+  <!-- Nút đóng panel -->
+  <button class="panel-close" type="button" aria-label="Đóng">
+    <span class="x"></span><span>Đóng</span>
+  </button>
+
+  <!-- ============ Thư viện hiệu ứng ============ -->
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/vendor/lenis.min.js"></script>
+  <script>
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ---- Nút chuyển Dark / Light (luôn hoạt động) ---- */
+    (function () {
+      const root = document.documentElement;
+      const btn = document.querySelector(".theme-toggle");
+      if (!btn) return;
+      function apply(theme) {
+        if (theme === "light") root.setAttribute("data-theme", "light");
+        else root.removeAttribute("data-theme");
+        btn.setAttribute("aria-pressed", String(theme === "light"));
+        try { localStorage.setItem("ssd-theme", theme); } catch (e) {}
+      }
+      // đồng bộ trạng thái ban đầu
+      apply(root.getAttribute("data-theme") === "light" ? "light" : "dark");
+      btn.addEventListener("click", () => {
+        apply(root.getAttribute("data-theme") === "light" ? "dark" : "light");
+      });
+    })();
+
+    /* ---- Vị trí menu (MOBILE): bấm điểm chọn để đặt menu, bấm Save để lưu ---- */
+    (function () {
+      const root = document.documentElement;
+      const saveBtn = document.querySelector(".save-btn");
+      const toast = document.getElementById("toast");
+      const dots = [].slice.call(document.querySelectorAll(".pos-dot"));
+      const POS = ["left", "center", "right"];
+      const isMobile = () => window.matchMedia("(max-width:640px)").matches;
+      let toastTimer;
+
+      function curPos() {
+        const p = root.getAttribute("data-pos");
+        return POS.indexOf(p) >= 0 ? p : "left";
+      }
+      // Lật hướng fan cho vị trí phải (khi có GSAP vì GSAP ghi transform inline đè CSS)
+      function applyFan() {
+        if (!window.gsap) return;               // không GSAP → CSS lo phần này
+        const mirror = isMobile() && curPos() === "right";
+        document.querySelectorAll(".spoke").forEach((s) => {
+          const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
+          gsap.to(s, {
+            rotation: mirror ? -deg : deg,
+            transformOrigin: mirror ? "right center" : "left center",
+            duration: .45, ease: "power3.out", overwrite: "auto"
+          });
+        });
+      }
+      let editing = false;
+      function showToast(msg) {
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+      }
+      function setEditing(on) {
+        editing = on;
+        root.classList.toggle("pos-editing", on);
+        if (saveBtn) saveBtn.setAttribute("aria-pressed", String(on));
+      }
+      function setPos(pos) {
+        root.setAttribute("data-pos", pos);      // menu trượt tới vị trí xem trước
+        applyFan();
+      }
+
+      // bấm 1 trong 3 điểm → đặt menu ở đó (xem trước, chưa lưu)
+      dots.forEach((d) => d.addEventListener("click", () => setPos(d.dataset.pos)));
+
+      // nút đĩa mềm: lần 1 = bật chọn vị trí, lần 2 = lưu & ẩn điểm
+      if (saveBtn) saveBtn.addEventListener("click", () => {
+        if (!isMobile()) return;
+        if (!editing) {
+          setEditing(true);
+          showToast("Chọn vị trí rồi bấm Lưu");
+        } else {
+          try { localStorage.setItem("ssd-menu-pos", curPos()); } catch (e) {}
+          setEditing(false);
+          showToast("Đã lưu vị trí menu");
+        }
+      });
+      // rời chế độ chọn khi bấm ra ngoài (không phải điểm chọn / nút Save)
+      document.addEventListener("click", (e) => {
+        if (editing && !e.target.closest(".pos-dot") && !e.target.closest(".save-btn")) setEditing(false);
+      });
+
+      // áp đúng hướng fan cho vị trí đã lưu (sau khi GSAP intro chạy) + khi xoay màn hình
+      setTimeout(applyFan, 1500);
+      window.addEventListener("resize", applyFan);
+    })();
+
+    /* ---- Kéo mặt số để XOAY cả cụm menu (render tách khỏi input → mượt) ---- */
+    (function () {
+      const root = document.documentElement;
+      const lens = document.querySelector(".dial-lens");
+      const spokes = [].slice.call(document.querySelectorAll(".spoke"));
+      if (!lens) return;
+
+      let targetRot = 0, rot = 0, prevTarget = 0, vel = 0;
+      let dragging = false, lastAng = 0, running = false, raf = 0;
+
+      const center = () => {
+        const r = lens.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      };
+      const angle = (x, y) => { const c = center(); return Math.atan2(y - c.y, x - c.x) * 180 / Math.PI; };
+      const norm = (d) => { while (d > 180) d -= 360; while (d < -180) d += 360; return d; };
+      const isMirror = () =>
+        window.matchMedia("(max-width:640px)").matches && root.getAttribute("data-pos") === "right";
+
+      // vẽ theo góc "rot" đã được làm mượt
+      function render() {
+        const m = isMirror();
+        for (let i = 0; i < spokes.length; i++) {
+          const s = spokes[i];
+          const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
+          s.style.transform = "rotate(" + ((m ? -deg : deg) + rot) + "deg)";
+        }
+        lens.style.transform = "rotate(" + rot + "deg)";
+      }
+
+      // vòng lặp: kéo → theo sát; buông → quán tính; luôn ease tới đích cho mượt
+      function loop() {
+        if (dragging) {
+          vel = vel * 0.6 + (targetRot - prevTarget) * 0.4;   // vận tốc làm mượt
+          prevTarget = targetRot;
+        } else {
+          targetRot += vel;                                    // quán tính
+          vel *= 0.94;
+          if (Math.abs(vel) < 0.015) vel = 0;
+        }
+        rot += (targetRot - rot) * 0.25;                       // nội suy mượt
+        render();
+        if (dragging || vel !== 0 || Math.abs(targetRot - rot) > 0.02) {
+          raf = requestAnimationFrame(loop);
+        } else {
+          rot = targetRot; render(); running = false;
+        }
+      }
+      function start() { if (!running) { running = true; prevTarget = targetRot; raf = requestAnimationFrame(loop); } }
+
+      lens.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        try { lens.setPointerCapture(e.pointerId); } catch (_) {}
+        lastAng = angle(e.clientX, e.clientY);
+        vel = 0; prevTarget = targetRot;
+        root.classList.add("dial-dragging");
+        e.preventDefault();
+        start();
+      });
+      window.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        const a = angle(e.clientX, e.clientY);
+        targetRot += norm(a - lastAng);     // chỉ cập nhật đích, render để loop lo
+        lastAng = a;
+        start();
+      });
+      function release() {
+        if (!dragging) return;
+        dragging = false;
+        root.classList.remove("dial-dragging");
+        start();                            // loop tiếp tục chạy quán tính
+      }
+      window.addEventListener("pointerup", release);
+      window.addEventListener("pointercancel", release);
+    })();
+
+    if (!window.gsap) {
+      // Không có thư viện → hiện mọi thứ (menu + panel vẫn dùng được, chỉ không có hiệu ứng).
+      document.documentElement.classList.remove("has-js");
+      // fallback tối thiểu: click menu để mở panel bằng CSS class
+      document.querySelectorAll('.spoke a, a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const id = a.getAttribute("href").slice(1);
+          e.preventDefault();
+          document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+          document.documentElement.classList.remove("panel-open");
+          if (id && id !== "home") {
+            const p = document.getElementById(id);
+            if (p) { p.classList.add("active"); document.documentElement.classList.add("panel-open"); }
+          }
+        });
+      });
+      const cb = document.querySelector(".panel-close");
+      if (cb) cb.addEventListener("click", () => {
+        document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+        document.documentElement.classList.remove("panel-open");
+      });
+    } else {
+      const root    = document.documentElement;
+      const arc     = document.querySelector(".arc");
+      const spokes  = gsap.utils.toArray(".spoke");
+      const anchors = spokes.map((s) => s.querySelector("a"));
+      const panels  = gsap.utils.toArray(".panel");
+      const closeBtn = document.querySelector(".panel-close");
+
+      /* ---- Intro khi tải: logo, icon, mặt số, rồi MENU XOÈ RA (thường trực) ---- */
+      if (reduce) {
+        gsap.set([".brand", ".theme-toggle", ".dial-lens"], { opacity: 1 });
+        spokes.forEach((s) => {
+          const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
+          gsap.set(s, { opacity: 1, rotation: deg, transformOrigin: "left center" });
+        });
+      } else {
+        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+        intro
+          .to([".brand", ".theme-toggle"], { opacity: 1, duration: .8, stagger: .1 })
+          .fromTo(".dial-lens",
+            { opacity: 0, scale: .5, transformOrigin: "50% 50%" },
+            { opacity: 1, scale: 1, duration: 1 }, "-=.4");
+        spokes.forEach((s, i) => {
+          const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
+          intro.fromTo(s,
+            { opacity: 0, rotation: -1, transformOrigin: "left center" },
+            { opacity: 1, rotation: deg, duration: .7 }, .5 + i * .08);
+          gsap.from(s.querySelector("a"), { x: -22, duration: .7, ease: "power3.out", delay: .5 + i * .08 });
+        });
+      }
+
+      /* ---- Mở / đóng PANEL nội dung ---- */
+      function openPanel(id) {
+        const panel = document.getElementById(id);
+        if (!panel || !panel.classList.contains("panel")) return;
+        panels.forEach((p) => { if (p !== panel) p.classList.remove("active"); });
+        panel.classList.add("active");
+        panel.scrollTop = 0;
+        root.classList.add("panel-open");
+        anchors.forEach((a) => a.classList.toggle("current", a.getAttribute("href") === "#" + id));
+
+        const els = panel.querySelectorAll(".reveal");
+        if (reduce) gsap.set(els, { opacity: 1, y: 0 });
+        else gsap.fromTo(els,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: .7, ease: "power3.out", stagger: .09, delay: .12, overwrite: true });
+      }
+      function closePanel() {
+        panels.forEach((p) => p.classList.remove("active"));
+        root.classList.remove("panel-open");
+        anchors.forEach((a) => a.classList.remove("current"));
+      }
+
+      /* ---- Mọi link #... : #home = đóng/về trang chủ, còn lại mở panel tương ứng ---- */
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          const id = a.getAttribute("href").slice(1);
+          if (!id || id === "home") closePanel();
+          else openPanel(id);
+        });
+      });
+
+      closeBtn.addEventListener("click", closePanel);
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePanel(); });
+    }
+  </script>
+
+</body>
+</html>

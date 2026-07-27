@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSD — Studio of Smile Design</title>
+<script>
+  document.documentElement.classList.add("has-js");
+  try {
+    var _t = localStorage.getItem("ssd2-theme");
+    if (_t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  } catch (e) {}
+</script>
+<link href="assets/fonts/fonts.css" rel="stylesheet" />
+<style>
+  :root{
+    /* ----- Light (mặc định): tông phòng khám sạch, teal + kem ----- */
+    --bg:#f5f4ef;
+    --surface:#ffffff;
+    --ink:#13302d;
+    --muted:#5c6d6a;
+    --line:rgba(19,48,45,.12);
+    --accent:#0f8a80;
+    --accent-soft:#e4f1ef;
+    --shadow:0 24px 60px -32px rgba(19,48,45,.35);
+    /* overlay menu: luôn là teal đậm, chữ kem */
+    --menu-bg-1:#0f766e;
+    --menu-bg-2:#0a3d3a;
+    --menu-fg:#eef6f4;
+    --menu-fg-dim:rgba(238,246,244,.45);
+  }
+  html[data-theme="dark"]{
+    --bg:#0b1413;
+    --surface:#111e1c;
+    --ink:#e8f0ee;
+    --muted:#90a4a1;
+    --line:rgba(255,255,255,.12);
+    --accent:#3fd0c2;
+    --accent-soft:rgba(63,208,194,.12);
+    --shadow:0 24px 60px -30px rgba(0,0,0,.7);
+    --menu-bg-1:#0c4d48;
+    --menu-bg-2:#04211f;
+    --menu-fg:#eef6f4;
+    --menu-fg-dim:rgba(238,246,244,.4);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Barlow",system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    overflow-x:hidden;
+    transition:background-color .5s ease, color .5s ease;
+  }
+  body.no-scroll{overflow:hidden}
+  ::selection{background:var(--accent);color:#fff}
+  a{color:inherit;text-decoration:none}
+  .cond{font-family:"Barlow Condensed",sans-serif}
+
+  /* ================= TOP BAR ================= */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:60;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px clamp(22px,5vw,64px);
+    transition:padding .4s ease;
+  }
+  /* logo thanh dọc (element dùng lại từ trang 1) */
+  .brand{display:flex;align-items:flex-end;gap:4px;height:34px}
+  .brand span{width:3.5px;background:var(--ink);border-radius:1px;animation:eq 1.6s ease-in-out infinite;transition:background-color .5s}
+  .brand span:nth-child(1){height:60%}
+  .brand span:nth-child(2){height:100%;animation-delay:.15s}
+  .brand span:nth-child(3){height:44%;animation-delay:.3s}
+  .brand span:nth-child(4){height:78%;animation-delay:.45s}
+  .brand span:nth-child(5){height:30%;animation-delay:.6s}
+  @keyframes eq{0%,100%{transform:scaleY(.7)}50%{transform:scaleY(1)}}
+  .brand-word{margin-left:12px;font-weight:600;letter-spacing:.28em;font-size:14px;text-transform:uppercase}
+
+  .topbar-right{display:flex;align-items:center;gap:20px}
+
+  /* nút Dark/Light (element dùng lại) */
+  .theme-toggle{
+    width:26px;height:26px;padding:0;background:none;border:none;cursor:pointer;
+    color:var(--ink);opacity:.75;transition:opacity .3s,transform .5s cubic-bezier(.2,.7,.2,1),color .5s;
+    position:relative;
+  }
+  .theme-toggle:hover{opacity:1;transform:rotate(20deg)}
+  .theme-toggle svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s,transform .45s}
+  .theme-toggle .icon-sun{opacity:1;transform:none}
+  .theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
+  html[data-theme="dark"] .theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
+  html[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;transform:none}
+
+  /* ---- HAMBURGER (menu mới) ---- */
+  .burger{
+    position:relative;width:46px;height:46px;border:1px solid var(--line);border-radius:50%;
+    background:none;cursor:pointer;display:grid;place-items:center;
+    transition:border-color .4s, background-color .4s;
+    color:var(--ink);
+  }
+  .burger:hover{background:var(--accent-soft)}
+  .burger .lines{position:relative;width:18px;height:12px}
+  .burger .lines i{
+    position:absolute;left:0;width:100%;height:1.6px;background:currentColor;border-radius:2px;
+    transition:transform .45s cubic-bezier(.7,0,.2,1), opacity .3s, background-color .4s;
+  }
+  .burger .lines i:nth-child(1){top:0}
+  .burger .lines i:nth-child(2){top:5px}
+  .burger .lines i:nth-child(3){top:10px}
+  /* trạng thái mở → chữ X, màu kem */
+  body.menu-open .burger{border-color:rgba(238,246,244,.4);color:var(--menu-fg);position:fixed;right:clamp(22px,5vw,64px);top:22px}
+  body.menu-open .burger:hover{background:rgba(238,246,244,.08)}
+  body.menu-open .burger .lines i:nth-child(1){transform:translateY(5px) rotate(45deg)}
+  body.menu-open .burger .lines i:nth-child(2){opacity:0}
+  body.menu-open .burger .lines i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+  body.menu-open .theme-toggle{opacity:0;pointer-events:none}
+  body.menu-open .brand span{background:var(--menu-fg)}
+
+  /* ================= OVERLAY MENU (premium) ================= */
+  .overlay{
+    position:fixed;inset:0;z-index:55;overflow:hidden;
+    color:var(--menu-fg);
+    background:
+      radial-gradient(120% 90% at 88% 6%, #14685f 0%, transparent 55%),
+      radial-gradient(90% 80% at 6% 104%, #0c534d 0%, transparent 52%),
+      linear-gradient(155deg,#0c4a45 0%,#051f1d 78%);
+    clip-path:circle(0px at calc(100% - 45px) 45px);
+    transition:clip-path .82s cubic-bezier(.76,0,.24,1);
+    pointer-events:none;
+    display:flex;flex-direction:column;
+    padding:clamp(96px,12vh,140px) clamp(24px,6vw,100px) 32px;
+  }
+  body.menu-open .overlay{clip-path:circle(165% at calc(100% - 45px) 45px);pointer-events:auto}
+  /* lưới hạt sáng mờ trang trí */
+  .overlay::before{
+    content:"";position:absolute;inset:0;opacity:.6;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);
+    background-size:36px 36px;
+    -webkit-mask-image:radial-gradient(120% 100% at 82% 8%,#000,transparent 68%);
+            mask-image:radial-gradient(120% 100% at 82% 8%,#000,transparent 68%);
+  }
+
+  .ov-grid{
+    margin:auto 0;width:100%;position:relative;z-index:1;
+    display:grid;grid-template-columns:1.3fr .82fr;gap:clamp(34px,5vw,88px);align-items:center;
+  }
+  .ov-eyebrow{
+    font-family:"Barlow Condensed";font-size:12px;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--menu-fg-dim);margin-bottom:26px;display:flex;align-items:center;gap:12px;
+  }
+  .ov-eyebrow::before{content:"";width:26px;height:1px;background:currentColor;opacity:.5}
+
+  .menu-list{list-style:none}
+  .menu-item{position:relative}
+  .menu-item + .menu-item{border-top:1px solid rgba(238,246,244,.12)}
+  .menu-link{
+    display:flex;align-items:center;gap:22px;position:relative;isolation:isolate;
+    padding:clamp(11px,1.7vh,22px) 20px;
+  }
+  /* nền sáng mờ trượt vào khi hover */
+  .menu-link::before{
+    content:"";position:absolute;inset:0;z-index:-1;border-radius:12px;
+    background:rgba(255,255,255,.05);
+    transform:scaleX(.4);opacity:0;transform-origin:left;
+    transition:transform .55s cubic-bezier(.76,0,.24,1),opacity .4s;
+  }
+  .menu-link:hover::before{transform:scaleX(1);opacity:1}
+  .menu-link .num{
+    font-family:"Barlow Condensed";font-size:13px;letter-spacing:.18em;
+    color:var(--menu-fg-dim);width:26px;flex:none;transition:opacity .35s,color .35s;
+  }
+  /* chữ trồi lên từ mặt nạ */
+  .mask{overflow:hidden;display:block;flex:1;padding:.16em 0}
+  .txt{
+    display:block;font-family:"Barlow Condensed";font-weight:500;text-transform:uppercase;
+    font-size:clamp(30px,4.4vw,60px);line-height:1;letter-spacing:.01em;
+    transition:color .4s ease;
+  }
+  .has-js .menu-item .txt{transform:translateY(115%)}
+  .menu-link:hover .txt{color:var(--acc)}
+  .menu-link:hover .mask{transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+  .menu-link:hover .num{opacity:0}
+  /* mũi tên trượt vào */
+  .arw{
+    width:30px;height:20px;flex:none;color:var(--acc);
+    opacity:0;transform:translateX(-16px);
+    transition:opacity .4s,transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .menu-link:hover .arw{opacity:1;transform:translateX(0)}
+
+  /* ---- panel ảnh preview bên phải ---- */
+  .ov-media{
+    position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.7);
+    --acc:#5eead4;
+  }
+  .ov-media-img{
+    position:absolute;inset:0;background:url("images/background2.png") center/cover;
+    transform:scale(1.08);transition:transform 1s cubic-bezier(.2,.7,.2,1);
+  }
+  body.menu-open .ov-media-img{transform:scale(1)}
+  .ov-media-tint{position:absolute;inset:0;background:var(--acc);mix-blend-mode:color;opacity:.32;transition:background .55s ease}
+  .ov-media-shade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 38%,rgba(3,22,20,.9))}
+  .ov-cap{position:absolute;left:24px;right:24px;bottom:24px;z-index:2}
+  .ov-cap .k{font-family:"Barlow Condensed";letter-spacing:.24em;font-size:11px;text-transform:uppercase;color:var(--acc);transition:color .45s}
+  .ov-cap .t{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(22px,2.4vw,30px);line-height:1.05;margin-top:6px}
+  .ov-cap .s{font-size:13.5px;color:rgba(238,246,244,.78);margin-top:8px}
+
+  /* footer overlay */
+  .ov-foot{
+    position:relative;z-index:1;margin-top:24px;padding-top:22px;
+    border-top:1px solid rgba(238,246,244,.12);
+    display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    font-family:"Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--menu-fg-dim);
+  }
+  .ov-foot .socials{display:flex;gap:22px}
+  .ov-foot a{transition:color .3s}
+  .ov-foot a:hover{color:var(--menu-fg)}
+
+  /* ================= HERO ================= */
+  .hero{
+    position:relative;min-height:100vh;display:flex;align-items:center;
+    padding:120px clamp(22px,6vw,110px) 80px;overflow:hidden;
+  }
+  .hero-media{
+    position:absolute;inset:0;z-index:-2;
+    background:var(--bg) url("images/background2.png") center 32% / cover no-repeat;
+  }
+  .hero-media::after{
+    content:"";position:absolute;inset:0;
+    background:
+      linear-gradient(100deg, var(--bg) 20%, rgba(245,244,239,.72) 44%, rgba(245,244,239,.15) 70%, transparent 100%),
+      linear-gradient(0deg, var(--bg), transparent 40%);
+  }
+  html[data-theme="dark"] .hero-media::after{
+    background:
+      linear-gradient(100deg, var(--bg) 18%, rgba(11,20,19,.78) 46%, rgba(11,20,19,.25) 72%, transparent 100%),
+      linear-gradient(0deg, var(--bg), transparent 42%);
+  }
+  .hero-inner{max-width:760px}
+  .hero .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.3em;font-size:13px;color:var(--accent);
+    margin-bottom:26px;
+  }
+  .hero .eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
+  .hero h1{
+    font-family:"Barlow Condensed",sans-serif;font-weight:600;text-transform:uppercase;
+    font-size:clamp(46px,8vw,110px);line-height:.96;letter-spacing:.01em;
+  }
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero .lead{margin-top:26px;font-size:clamp(17px,2vw,20px);color:var(--muted);max-width:520px}
+  .hero-cta{display:flex;flex-wrap:wrap;gap:16px;margin-top:40px}
+  .scroll-hint{position:absolute;bottom:34px;left:clamp(22px,6vw,110px);font-family:"Barlow Condensed";letter-spacing:.25em;text-transform:uppercase;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .scroll-hint .bar{width:44px;height:1px;background:var(--muted);position:relative;overflow:hidden}
+  .scroll-hint .bar::after{content:"";position:absolute;inset:0;background:var(--accent);transform:translateX(-100%);animation:slide 2.4s ease-in-out infinite}
+  @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(0)}100%{transform:translateX(100%)}}
+
+  /* buttons */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.12em;font-size:15px;font-weight:500;
+    padding:15px 30px;border-radius:40px;border:1px solid var(--accent);cursor:pointer;
+    transition:transform .3s, background-color .3s, color .3s;
+  }
+  .btn-solid{background:var(--accent);color:#fff}
+  .btn-solid:hover{transform:translateY(-3px)}
+  .btn-ghost{color:var(--ink)}
+  .btn-ghost:hover{background:var(--accent-soft);transform:translateY(-3px)}
+
+  /* ================= SECTIONS ================= */
+  .section{padding:clamp(90px,13vh,150px) clamp(22px,6vw,110px);position:relative;border-top:1px solid var(--line)}
+  .sec-head{display:flex;flex-direction:column}
+  .kicker{
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.32em;font-size:13px;
+    color:var(--accent);margin-bottom:18px;
+  }
+  .section h2{
+    font-family:"Barlow Condensed",sans-serif;font-weight:600;text-transform:uppercase;
+    font-size:clamp(34px,5.4vw,80px);line-height:1;letter-spacing:.01em;
+  }
+  .section .body{max-width:600px;margin-top:22px;color:var(--muted);font-size:18px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;margin-top:56px}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:34px 28px;
+    position:relative;overflow:hidden;transition:transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .4s;
+  }
+  .card::before{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .45s}
+  .card:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+  .card:hover::before{transform:scaleX(1)}
+  .card .idx{font-family:"Barlow Condensed";color:var(--accent);letter-spacing:.15em;font-size:13px}
+  .card h3{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:24px;letter-spacing:.03em;margin:14px 0 8px}
+  .card p{font-size:15px;color:var(--muted)}
+
+  .contact-row{display:flex;flex-wrap:wrap;gap:40px;margin-top:44px}
+  .contact-row a{font-size:clamp(20px,2.5vw,30px);font-family:"Barlow Condensed";border-bottom:1px solid var(--line);padding-bottom:8px;transition:border-color .3s,color .3s}
+  .contact-row a:hover{border-color:var(--accent);color:var(--accent)}
+  .copy{margin-top:70px;color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+
+  /* reveal (JS) */
+  .has-js .reveal{opacity:0;transform:translateY(30px)}
+
+  /* ================= Responsive ================= */
+  @media (max-width:860px){
+    .overlay-inner{grid-template-columns:1fr;gap:36px}
+    .menu-aside{display:none}
+  }
+  @media (max-width:640px){
+    .brand-word{display:none}
+    .menu-link .txt{font-size:34px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .brand span,.scroll-hint .bar::after{animation:none}
+    .has-js .reveal{opacity:1;transform:none}
+    .has-js .menu-item .txt{transform:none}
+    .overlay{transition:none}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="SSD - Studio of Smile Design">
+      <span></span><span></span><span></span><span></span><span></span>
+      <em class="brand-word cond" style="font-style:normal">SSD</em>
+    </a>
+
+    <div class="topbar-right">
+      <button class="theme-toggle" type="button" aria-label="Chuyển chế độ sáng/tối" title="Chế độ sáng/tối">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        </svg>
+      </button>
+
+      <button class="burger" type="button" aria-label="Mở menu" aria-expanded="false" aria-controls="overlay-menu">
+        <span class="lines"><i></i><i></i><i></i></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ OVERLAY MENU (premium) ============ -->
+  <nav class="overlay" id="overlay-menu" aria-label="Menu chính">
+    <div class="ov-grid">
+      <div>
+        <p class="ov-eyebrow">Điều hướng</p>
+        <ul class="menu-list">
+          <li class="menu-item" style="--acc:#5eead4"><a class="menu-link" href="#dichvu"  data-t="Dịch vụ"            data-s="Bọc sứ · Niềng · Implant · Tẩy trắng"><span class="num">01</span><span class="mask"><span class="txt">Dịch vụ</span></span><svg class="arw" viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h24M18 3l8 7-8 7"/></svg></a></li>
+          <li class="menu-item" style="--acc:#7dd3fc"><a class="menu-link" href="#doingu"  data-t="Đội ngũ SSD"        data-s="Bác sĩ tận tâm, giàu kinh nghiệm"><span class="num">02</span><span class="mask"><span class="txt">Đội ngũ SSD</span></span><svg class="arw" viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h24M18 3l8 7-8 7"/></svg></a></li>
+          <li class="menu-item" style="--acc:#a7f3d0"><a class="menu-link" href="#thuvien" data-t="Thư viện ảnh"       data-s="Hình ảnh trước &amp; sau thực tế"><span class="num">03</span><span class="mask"><span class="txt">Thư viện ảnh</span></span><svg class="arw" viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h24M18 3l8 7-8 7"/></svg></a></li>
+          <li class="menu-item" style="--acc:#fcd34d"><a class="menu-link" href="#kienthuc" data-t="Kiến thức nha khoa" data-s="Blog &amp; cẩm nang chăm sóc răng"><span class="num">04</span><span class="mask"><span class="txt">Kiến thức nha khoa</span></span><svg class="arw" viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h24M18 3l8 7-8 7"/></svg></a></li>
+          <li class="menu-item" style="--acc:#6ee7b7"><a class="menu-link" href="#dathen"  data-t="Đặt hẹn khám"       data-s="Tư vấn miễn phí, linh hoạt lịch"><span class="num">05</span><span class="mask"><span class="txt">Đặt hẹn khám</span></span><svg class="arw" viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h24M18 3l8 7-8 7"/></svg></a></li>
+          <li class="menu-item" style="--acc:#e2e8f0"><a class="menu-link" href="#lienhe"  data-t="Liên hệ"             data-s="Kết nối cùng Studio of Smile Design"><span class="num">06</span><span class="mask"><span class="txt">Liên hệ</span></span><svg class="arw" viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h24M18 3l8 7-8 7"/></svg></a></li>
+        </ul>
+      </div>
+
+      <div class="ov-media" id="ovMedia">
+        <div class="ov-media-img"></div>
+        <div class="ov-media-tint"></div>
+        <div class="ov-media-shade"></div>
+        <div class="ov-cap">
+          <div class="k" id="capK">Studio of Smile Design</div>
+          <div class="t" id="capT">Nụ cười thiết kế riêng</div>
+          <div class="s" id="capS">Chọn một mục để khám phá</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ov-foot">
+      <a href="mailto:hello@nhakhoassd.com">hello@nhakhoassd.com</a>
+      <div class="socials">
+        <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">Zalo</a>
+      </div>
+      <span>TP. Hồ Chí Minh · VN</span>
+    </div>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="home">
+    <div class="hero-media"></div>
+    <div class="hero-inner">
+      <span class="eyebrow reveal">Studio of Smile Design</span>
+      <h1 class="reveal">Nơi mỗi nụ cười<br/>là một <em>thiết kế</em> riêng</h1>
+      <p class="lead reveal">Nha khoa thẩm mỹ chuẩn studio — tối giản, tinh tế, chăm chút từng chi tiết như một tác phẩm.</p>
+      <div class="hero-cta reveal">
+        <a class="btn btn-solid" href="#dathen">Đặt hẹn khám</a>
+        <a class="btn btn-ghost" href="#dichvu">Xem dịch vụ</a>
+      </div>
+    </div>
+    <div class="scroll-hint"><span class="bar"></span> Cuộn xuống</div>
+  </section>
+
+  <!-- ============ SECTIONS (nội dung y chang trang 1) ============ -->
+  <section class="section" id="dichvu">
+    <div class="sec-head">
+      <span class="kicker reveal">01 — Dịch vụ</span>
+      <h2 class="reveal">Nha khoa thẩm mỹ<br/>chuẩn Studio</h2>
+      <p class="body reveal">Thiết kế nụ cười cá nhân hoá, tối giản mà tinh tế — nơi từng chi tiết được chăm chút như một tác phẩm.</p>
+    </div>
+    <div class="cards">
+      <div class="card reveal"><span class="idx">01</span><h3>Bọc răng sứ</h3><p>Phục hình thẩm mỹ, màu sắc tự nhiên.</p></div>
+      <div class="card reveal"><span class="idx">02</span><h3>Niềng răng</h3><p>Chỉnh nha trong suốt &amp; mắc cài.</p></div>
+      <div class="card reveal"><span class="idx">03</span><h3>Implant</h3><p>Trồng răng cố định, bền vững.</p></div>
+      <div class="card reveal"><span class="idx">04</span><h3>Tẩy trắng</h3><p>Làm sáng răng an toàn.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="doingu">
+    <div class="sec-head">
+      <span class="kicker reveal">02 — Đội ngũ SSD</span>
+      <h2 class="reveal">Studio of<br/>Smile Design</h2>
+      <p class="body reveal">Đội ngũ bác sĩ giàu kinh nghiệm, tận tâm với triết lý "mỗi nụ cười là một thiết kế riêng".</p>
+    </div>
+  </section>
+
+  <section class="section" id="thuvien">
+    <div class="sec-head">
+      <span class="kicker reveal">03 — Thư viện ảnh</span>
+      <h2 class="reveal">Trước &amp; Sau</h2>
+      <p class="body reveal">Bộ sưu tập những ca điều trị thực tế, minh chứng cho sự thay đổi tự nhiên và hài hoà.</p>
+    </div>
+  </section>
+
+  <section class="section" id="kienthuc">
+    <div class="sec-head">
+      <span class="kicker reveal">04 — Kiến thức nha khoa</span>
+      <h2 class="reveal">Blog &amp; Cẩm nang</h2>
+      <p class="body reveal">Chia sẻ kiến thức chăm sóc răng miệng, xu hướng nha khoa hiện đại và lời khuyên từ chuyên gia.</p>
+    </div>
+  </section>
+
+  <section class="section" id="dathen">
+    <div class="sec-head">
+      <span class="kicker reveal">05 — Đặt hẹn khám</span>
+      <h2 class="reveal">Đặt lịch<br/>tư vấn miễn phí</h2>
+      <p class="body reveal">Chọn thời gian phù hợp, đội ngũ SSD sẽ liên hệ xác nhận trong thời gian sớm nhất.</p>
+      <div class="hero-cta reveal" style="margin-top:34px">
+        <a class="btn btn-solid" href="tel:+84000000000">Gọi đặt lịch</a>
+        <a class="btn btn-ghost" href="#lienhe">Gửi yêu cầu</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="lienhe">
+    <div class="sec-head">
+      <span class="kicker reveal">06 — Liên hệ</span>
+      <h2 class="reveal">Kết nối<br/>với chúng tôi</h2>
+      <div class="contact-row reveal">
+        <a href="mailto:hello@nhakhoassd.com">hello@nhakhoassd.com</a>
+        <a href="tel:+84000000000">+84 000 000 000</a>
+        <a href="#home">nhakhoassd.com</a>
+      </div>
+      <p class="copy reveal">© 2026 SSD — Studio of Smile Design. All rights reserved.</p>
+    </div>
+  </section>
+
+  <!-- ============ Thư viện hiệu ứng ============ -->
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/vendor/lenis.min.js"></script>
+  <script>
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = document.documentElement;
+    const body = document.body;
+
+    /* ---- Dark / Light (element dùng lại) ---- */
+    (function () {
+      const btn = document.querySelector(".theme-toggle");
+      if (!btn) return;
+      function apply(theme) {
+        if (theme === "dark") root.setAttribute("data-theme", "dark");
+        else root.removeAttribute("data-theme");
+        btn.setAttribute("aria-pressed", String(theme === "dark"));
+        try { localStorage.setItem("ssd2-theme", theme); } catch (e) {}
+      }
+      apply(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
+      btn.addEventListener("click", () =>
+        apply(root.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+    })();
+
+    /* ---- MENU OVERLAY premium: mở/đóng + reveal mask + preview ---- */
+    const burger = document.querySelector(".burger");
+    const overlay = document.querySelector(".overlay");
+    const menuLinks = [].slice.call(document.querySelectorAll(".menu-link"));
+    const txts = [].slice.call(document.querySelectorAll(".menu-item .txt"));
+    const media = document.getElementById("ovMedia");
+    const capK = document.getElementById("capK");
+    const capT = document.getElementById("capT");
+    const capS = document.getElementById("capS");
+    let menuOpen = false;
+
+    // hover từng mục → đổi tông ảnh + caption bên phải
+    menuLinks.forEach((a) => {
+      a.addEventListener("mouseenter", () => {
+        const acc = a.closest(".menu-item").style.getPropertyValue("--acc").trim();
+        if (media) media.style.setProperty("--acc", acc);
+        if (capK) capK.textContent = a.querySelector(".num").textContent + " — SSD";
+        if (capT) capT.textContent = a.dataset.t;
+        if (capS) capS.textContent = a.dataset.s;
+      });
+    });
+
+    function setMenu(open) {
+      if (open === menuOpen) return;
+      menuOpen = open;
+      body.classList.toggle("menu-open", open);
+      body.classList.toggle("no-scroll", open);
+      burger.setAttribute("aria-expanded", String(open));
+      burger.setAttribute("aria-label", open ? "Đóng menu" : "Mở menu");
+
+      if (!window.gsap || reduce) return; // clip-path + CSS lo phần còn lại
+      if (open) {
+        gsap.fromTo(txts,
+          { yPercent: 115 },
+          { yPercent: 0, duration: .8, ease: "power4.out", stagger: .06, delay: .24, overwrite: true });
+      } else {
+        gsap.to(txts, { yPercent: 115, duration: .4, ease: "power3.in", stagger: .03, overwrite: true });
+      }
+    }
+
+    burger.addEventListener("click", () => setMenu(!menuOpen));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+
+    // xử lý mọi link #... an toàn (bỏ qua href="#")
+    function bindAnchors(scrollFn) {
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const href = a.getAttribute("href");
+          const wasInOverlay = !!a.closest(".overlay");
+          if (href === "#") { e.preventDefault(); setMenu(false); return; }
+          const el = document.querySelector(href);
+          if (!el) return;
+          e.preventDefault();
+          setMenu(false);
+          if (scrollFn) wasInOverlay ? setTimeout(() => scrollFn(el), 480) : scrollFn(el);
+        });
+      });
+    }
+
+    if (!window.gsap) {
+      // Không có thư viện: hiện hết nội dung, menu vẫn mở/đóng bằng class, cuộn thường.
+      root.classList.remove("has-js");
+      bindAnchors((el) => el.scrollIntoView({ behavior: "smooth" }));
+    } else {
+      gsap.registerPlugin(ScrollTrigger);
+
+      /* Cuộn mượt Lenis */
+      let lenis = null;
+      if (window.Lenis && !reduce) {
+        lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+        lenis.on("scroll", ScrollTrigger.update);
+        gsap.ticker.add((t) => lenis.raf(t * 1000));
+        gsap.ticker.lagSmoothing(0);
+      }
+      // link #anchor: đóng menu → cuộn tới section (chờ overlay đóng nếu bấm trong menu)
+      bindAnchors((el) => lenis ? lenis.scrollTo(el, { offset: 0 }) : el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
+
+      /* Intro hero + reveal khi cuộn */
+      if (reduce) {
+        gsap.set(".reveal", { opacity: 1, y: 0 });
+      } else {
+        gsap.to(".hero .reveal", { opacity: 1, y: 0, duration: .9, ease: "power3.out", stagger: .12, delay: .2 });
+        gsap.utils.toArray(".section").forEach((sec) => {
+          gsap.to(sec.querySelectorAll(".reveal"), {
+            opacity: 1, y: 0, duration: .9, ease: "power3.out", stagger: .1,
+            scrollTrigger: { trigger: sec, start: "top 75%" }
+          });
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
