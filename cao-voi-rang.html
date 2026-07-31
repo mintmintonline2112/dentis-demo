@@ -6,19 +6,20 @@
 <title>SSD — Cạo vôi răng</title>
 <script>
   document.documentElement.classList.add("has-js");
-  try { if (localStorage.getItem("ssd-cvr-theme") === "dark") document.documentElement.setAttribute("data-theme","dark"); } catch(e){}
+  try { if (localStorage.getItem("ssd-cvr-theme") === "light") document.documentElement.setAttribute("data-theme","light"); } catch(e){}
 </script>
 <link href="assets/fonts/fonts.css" rel="stylesheet" />
 <style>
+  /* ----- Mono (mặc định Dark) — đồng bộ landing-1 ----- */
   :root{
-    --bg:#f3f6f6;--surface:#ffffff;--ink:#132523;--muted:#5c6f6c;
-    --line:rgba(19,37,35,.13);--accent:#12a594;--accent-2:#0d7d70;
-    --accent-soft:#dcf1ee;--shadow:0 30px 70px -36px rgba(19,37,35,.4);--shadow-sm:0 14px 34px -22px rgba(19,37,35,.5);
+    --bg:#0b0b0d;--surface:#131316;--ink:#e9e9ea;--muted:#8a8a8f;
+    --line:rgba(255,255,255,.14);--accent:#d9d9dc;--accent-2:#bcbcc0;
+    --accent-soft:rgba(255,255,255,.08);--shadow:0 30px 70px -32px rgba(0,0,0,.72);--shadow-sm:0 14px 34px -20px rgba(0,0,0,.7);
   }
-  html[data-theme="dark"]{
-    --bg:#0a1210;--surface:#111b19;--ink:#e7efed;--muted:#8ba09c;
-    --line:rgba(255,255,255,.13);--accent:#3fd6c4;--accent-2:#2bb3a2;
-    --accent-soft:rgba(63,214,196,.13);--shadow:0 30px 70px -32px rgba(0,0,0,.72);--shadow-sm:0 14px 34px -20px rgba(0,0,0,.7);
+  html[data-theme="light"]{
+    --bg:#f4f4f5;--surface:#ffffff;--ink:#17171a;--muted:#5f5f66;
+    --line:rgba(0,0,0,.14);--accent:#2a2a30;--accent-2:#17171a;
+    --accent-soft:rgba(0,0,0,.06);--shadow:0 30px 70px -36px rgba(19,20,24,.4);--shadow-sm:0 14px 34px -22px rgba(19,20,24,.5);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -42,16 +43,16 @@
   .theme-toggle{width:26px;height:26px;padding:0;background:none;border:none;cursor:pointer;color:var(--ink);opacity:.75;position:relative;transition:opacity .3s,transform .5s cubic-bezier(.2,.7,.2,1),color .5s}
   .theme-toggle:hover{opacity:1;transform:rotate(20deg)}
   .theme-toggle svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s,transform .45s}
-  .theme-toggle .icon-sun{opacity:1}.theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
-  html[data-theme="dark"] .theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
-  html[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;transform:none}
+  .theme-toggle .icon-moon{opacity:1}.theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
+  html[data-theme="light"] .theme-toggle .icon-sun{opacity:1;transform:none}
+  html[data-theme="light"] .theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
 
   /* ===== hero banner ===== */
   .hero{position:relative;min-height:78vh;display:flex;align-items:flex-end;padding:130px 0 54px;overflow:hidden}
   .hero-bg{position:absolute;inset:0;z-index:-2;background:var(--bg) url("images/background2.png") center 30%/cover no-repeat;filter:saturate(.9)}
   .hero-bg::after{content:"";position:absolute;inset:0;background:
-     linear-gradient(180deg, rgba(8,20,18,.35) 0%, rgba(8,20,18,.15) 30%, rgba(8,20,18,.62) 78%, var(--bg) 100%),
-     linear-gradient(90deg, rgba(8,20,18,.4), transparent 60%)}
+     linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,.15) 30%, rgba(0,0,0,.62) 78%, var(--bg) 100%),
+     linear-gradient(90deg, rgba(0,0,0,.42), transparent 60%)}
   .breadcrumb{color:rgba(255,255,255,.82);font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.2em;font-size:12px;margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap}
   .breadcrumb a{opacity:.8}.breadcrumb a:hover{opacity:1;color:#fff}
   .breadcrumb .sep{opacity:.5}
@@ -65,7 +66,7 @@
   .stat span{font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.14em;font-size:11px;opacity:.82}
 
   .btn{display:inline-flex;align-items:center;gap:10px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.12em;font-size:15px;font-weight:500;padding:15px 32px;border-radius:40px;cursor:pointer;transition:transform .3s,background-color .3s,color .3s,border-color .3s;border:1px solid transparent}
-  .btn-solid{background:var(--accent);color:#04211d}
+  .btn-solid{background:var(--accent);color:var(--bg)}
   .btn-solid:hover{transform:translateY(-3px);background:var(--accent-2)}
   .btn-ghost{border-color:rgba(255,255,255,.5);color:#fff}
   .btn-ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-3px)}
@@ -77,24 +78,30 @@
   .intro p{color:var(--muted);font-size:clamp(16px,1.9vw,18px)}
   .intro p + p{margin-top:16px}
 
-  /* ===== process (3D) ===== */
+  /* ===== process (slider từng bước) ===== */
   .process{padding:70px 0}
   .process .head{text-align:center;margin-bottom:44px}
   .stage{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,5vw,64px);align-items:center}
   @media (max-width:860px){.stage{grid-template-columns:1fr}}
-  .viz{position:relative;aspect-ratio:1/1;border-radius:26px;overflow:hidden;
-    background:radial-gradient(120% 120% at 50% 20%, var(--accent-soft), transparent 62%), var(--surface);
-    border:1px solid var(--line);box-shadow:var(--shadow)}
-  .viz canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
-  .viz canvas:active{cursor:grabbing}
+
+  .viz{position:relative;aspect-ratio:1/1;border-radius:26px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface)}
   .viz .badge{position:absolute;left:18px;top:16px;z-index:3;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--accent);background:color-mix(in srgb,var(--surface) 72%,transparent);padding:6px 12px;border-radius:20px;border:1px solid var(--line)}
-  .viz .spin-hint{position:absolute;right:16px;bottom:14px;z-index:3;font-family:"Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:var(--muted)}
-  .viz .fallback{position:absolute;inset:0;display:none;place-items:center;padding:8%}
-  .viz.no3d canvas{display:none}.viz.no3d .fallback{display:grid}.viz.no3d .spin-hint{display:none}
-  .fallback svg{width:72%;height:auto}
-  .tartar{transition:opacity .5s ease, transform .5s ease;transform-origin:center}
-  .viz[data-step="1"] .t-a,.viz[data-step="1"] .t-b,.viz[data-step="1"] .t-c,.viz[data-step="1"] .t-d{opacity:0;transform:scale(0)}
-  .viz[data-step="2"] .tartar{opacity:0;transform:scale(0)}
+  .slides{display:flex;height:100%;transition:transform .6s cubic-bezier(.7,0,.2,1)}
+  .slide{flex:0 0 100%;height:100%;display:grid;place-items:center;position:relative;padding:9%}
+  .slide.s1{background:radial-gradient(circle at 50% 34%, rgba(201,167,90,.20), transparent 64%)}
+  .slide.s2{background:radial-gradient(circle at 50% 34%, rgba(63,180,255,.20), transparent 64%)}
+  .slide.s3{background:radial-gradient(circle at 50% 34%, color-mix(in srgb,var(--accent) 32%,transparent), transparent 66%)}
+  .slide svg{width:82%;height:auto;overflow:visible}
+  .slide .cap{position:absolute;left:0;right:0;bottom:20px;text-align:center;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--muted)}
+  .tooth{stroke:rgba(0,0,0,.16);stroke-width:2.4}
+  /* hoạt hình */
+  @keyframes drip{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(46px);opacity:0}}
+  @keyframes vibe{0%{transform:translate(0,0)}100%{transform:translate(1.5px,1.5px)}}
+  @keyframes twinkle{0%,100%{transform:scale(.5);opacity:.2}50%{transform:scale(1);opacity:1}}
+  .drop{animation:drip 1.2s ease-in infinite}
+  .scaler-g{animation:vibe .1s ease-in-out infinite alternate;transform-origin:center}
+  .spark{transform-box:fill-box;transform-origin:center;animation:twinkle 1.7s ease-in-out infinite}
+  @media (prefers-reduced-motion: reduce){.drop,.scaler-g,.spark{animation:none}}
 
   .step{display:flex;gap:18px;padding:20px;border:1px solid var(--line);border-radius:16px;cursor:pointer;background:var(--surface);margin-bottom:14px;transition:border-color .3s,transform .3s,box-shadow .3s}
   .step:hover{transform:translateX(4px)}
@@ -137,11 +144,11 @@
 
   /* ===== CTA band ===== */
   .band{margin:40px auto 0;max-width:1180px}
-  .band .inner{background:linear-gradient(120deg,var(--accent),var(--accent-2));border-radius:24px;padding:clamp(36px,6vw,66px);text-align:center;color:#04211d}
-  .band h2{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(28px,4.5vw,52px);line-height:1;color:#052a25}
-  .band p{margin:14px auto 26px;max-width:520px;color:rgba(5,42,37,.85)}
-  .band .btn-solid{background:#052a25;color:#eafffb}
-  .band .btn-solid:hover{background:#04211d}
+  .band .inner{background:linear-gradient(120deg,var(--accent),var(--accent-2));border-radius:24px;padding:clamp(36px,6vw,66px);text-align:center;color:var(--bg)}
+  .band h2{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(28px,4.5vw,52px);line-height:1;color:var(--bg)}
+  .band p{margin:14px auto 26px;max-width:520px;color:color-mix(in srgb,var(--bg) 78%,transparent)}
+  .band .btn-solid{background:var(--bg);color:var(--ink)}
+  .band .btn-solid:hover{background:color-mix(in srgb,var(--bg) 88%,var(--ink))}
 
   footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;color:var(--muted);font-family:"Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin-top:70px}
   @media (prefers-reduced-motion: reduce){.brand span{animation:none}}
@@ -193,24 +200,67 @@
         <h2 class="sec">3 bước sạch vôi</h2>
       </div>
       <div class="stage">
-        <div class="viz" id="viz" data-step="0">
+        <div class="viz" id="viz">
           <span class="badge" id="vizBadge">Bước 1</span>
-          <canvas id="scene"></canvas>
-          <span class="spin-hint">Kéo để xoay ↻</span>
-          <div class="fallback">
-            <svg viewBox="0 0 240 300" fill="none" aria-label="Mô phỏng răng">
-              <path d="M120 20c-34 0-56 22-56 56 0 32 10 46 16 84 5 32 10 74 22 96 6 11 22 11 27-1 10-25 9-58 24-58s14 33 24 58c5 12 21 12 27 1 12-22 17-64 22-96 6-38 16-52 16-84 0-34-22-56-56-56-20 0-30 10-46 10s-26-10-46-10z" fill="var(--surface)" stroke="var(--muted)" stroke-width="3"/>
-              <g opacity=".92">
-                <circle class="tartar t-a" cx="78" cy="120" r="9" fill="var(--accent)"/>
-                <circle class="tartar t-b" cx="150" cy="112" r="11" fill="var(--accent)"/>
-                <circle class="tartar t-c" cx="96" cy="150" r="8" fill="var(--accent)"/>
-                <circle class="tartar t-d" cx="140" cy="150" r="9" fill="var(--accent)"/>
-                <circle class="tartar" cx="112" cy="128" r="7" fill="#b9975a"/>
-                <circle class="tartar" cx="128" cy="138" r="6" fill="#b9975a"/>
-                <circle class="tartar" cx="86" cy="98" r="7" fill="#b9975a"/>
-                <circle class="tartar" cx="158" cy="140" r="7" fill="#b9975a"/>
-              </g>
-            </svg>
+          <div class="slides" id="slides">
+
+            <!-- Bước 1: răng còn vôi -->
+            <div class="slide s1">
+              <svg viewBox="0 0 240 300" fill="none" aria-label="Răng còn vôi">
+                <path class="tooth" d="M120 20c-34 0-56 22-56 56 0 32 10 46 16 84 5 32 10 74 22 96 6 11 22 11 27-1 10-25 9-58 24-58s14 33 24 58c5 12 21 12 27 1 12-22 17-64 22-96 6-38 16-52 16-84 0-34-22-56-56-56-20 0-30 10-46 10s-26-10-46-10z" fill="#ece1c6"/>
+                <g opacity=".95">
+                  <circle cx="80" cy="118" r="9" fill="#c9a75a"/>
+                  <circle cx="150" cy="110" r="11" fill="#c1a052"/>
+                  <circle cx="98" cy="150" r="8" fill="#b9975a"/>
+                  <circle cx="140" cy="150" r="9" fill="#c9a75a"/>
+                  <circle cx="112" cy="126" r="7" fill="#b9975a"/>
+                  <circle cx="128" cy="138" r="6" fill="#c1a052"/>
+                  <circle cx="86" cy="96" r="7" fill="#c9a75a"/>
+                  <circle cx="158" cy="140" r="7" fill="#b9975a"/>
+                </g>
+              </svg>
+              <span class="cap">Vôi răng &amp; mảng bám tích tụ</span>
+            </div>
+
+            <!-- Bước 2: đang cạo -->
+            <div class="slide s2">
+              <svg viewBox="0 0 240 300" fill="none" aria-label="Đang cạo vôi">
+                <path class="tooth" d="M120 20c-34 0-56 22-56 56 0 32 10 46 16 84 5 32 10 74 22 96 6 11 22 11 27-1 10-25 9-58 24-58s14 33 24 58c5 12 21 12 27 1 12-22 17-64 22-96 6-38 16-52 16-84 0-34-22-56-56-56-20 0-30 10-46 10s-26-10-46-10z" fill="#f2ead6"/>
+                <g opacity=".9">
+                  <circle cx="150" cy="112" r="9" fill="#c9a75a"/>
+                  <circle cx="90" cy="140" r="7" fill="#b9975a"/>
+                </g>
+                <!-- đầu cạo siêu âm -->
+                <g class="scaler-g">
+                  <line x1="205" y1="40" x2="150" y2="112" stroke="#aeb7c0" stroke-width="9" stroke-linecap="round"/>
+                  <line x1="205" y1="40" x2="150" y2="112" stroke="#d7dde3" stroke-width="4" stroke-linecap="round"/>
+                  <circle cx="150" cy="112" r="6" fill="#eef4f8"/>
+                </g>
+                <!-- tia nước -->
+                <g fill="#7fd4ff">
+                  <circle class="drop" style="animation-delay:0s"   cx="150" cy="126" r="4"/>
+                  <circle class="drop" style="animation-delay:.4s"  cx="140" cy="124" r="3"/>
+                  <circle class="drop" style="animation-delay:.8s"  cx="160" cy="128" r="3.4"/>
+                </g>
+              </svg>
+              <span class="cap">Đầu siêu âm làm bong vôi + tia nước</span>
+            </div>
+
+            <!-- Bước 3: sạch bóng -->
+            <div class="slide s3">
+              <svg viewBox="0 0 240 300" fill="none" aria-label="Răng sạch bóng">
+                <path class="tooth" d="M120 20c-34 0-56 22-56 56 0 32 10 46 16 84 5 32 10 74 22 96 6 11 22 11 27-1 10-25 9-58 24-58s14 33 24 58c5 12 21 12 27 1 12-22 17-64 22-96 6-38 16-52 16-84 0-34-22-56-56-56-20 0-30 10-46 10s-26-10-46-10z" fill="#fdfdfb"/>
+                <path d="M96 70c14-8 34-8 48 0" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+                <g fill="var(--accent)">
+                  <path class="spark" style="animation-delay:0s"  transform="translate(66 88)"  d="M0 -9 L2 -2 L9 0 L2 2 L0 9 L-2 2 L-9 0 L-2 -2 Z"/>
+                  <path class="spark" style="animation-delay:.5s" transform="translate(176 96) scale(.8)" d="M0 -9 L2 -2 L9 0 L2 2 L0 9 L-2 2 L-9 0 L-2 -2 Z"/>
+                  <path class="spark" style="animation-delay:.9s" transform="translate(150 150) scale(.7)" d="M0 -9 L2 -2 L9 0 L2 2 L0 9 L-2 2 L-9 0 L-2 -2 Z"/>
+                  <path class="spark" style="animation-delay:1.3s" transform="translate(84 168) scale(.6)" d="M0 -9 L2 -2 L9 0 L2 2 L0 9 L-2 2 L-9 0 L-2 -2 Z"/>
+                </g>
+              </svg>
+              <span class="cap">Sạch bóng — nướu hồng khoẻ</span>
+            </div>
+
           </div>
         </div>
         <div class="steps">
@@ -257,143 +307,43 @@
 
   <footer>© 2026 SSD — Studio of Smile Design</footer>
 
-  <script src="assets/vendor/gsap.min.js"></script>
-  <script src="assets/vendor/three.min.js"></script>
   <script>
     /* Theme */
     (function () {
       const root = document.documentElement, btn = document.querySelector(".theme-toggle");
-      function apply(t){ t==="dark"?root.setAttribute("data-theme","dark"):root.removeAttribute("data-theme"); try{localStorage.setItem("ssd-cvr-theme",t);}catch(e){} }
-      apply(root.getAttribute("data-theme")==="dark"?"dark":"light");
-      btn.addEventListener("click",()=>apply(root.getAttribute("data-theme")==="dark"?"light":"dark"));
+      function apply(t){ t==="light"?root.setAttribute("data-theme","light"):root.removeAttribute("data-theme"); try{localStorage.setItem("ssd-cvr-theme",t);}catch(e){} }
+      apply(root.getAttribute("data-theme")==="light"?"light":"dark");
+      btn.addEventListener("click",()=>apply(root.getAttribute("data-theme")==="light"?"dark":"light"));
     })();
     /* topbar scrolled */
     (function(){ const tb=document.getElementById("topbar"); const on=()=>tb.classList.toggle("scrolled",window.scrollY>40); on(); window.addEventListener("scroll",on,{passive:true}); })();
 
-    /* ===== 3D scene ===== */
-    function init3D() {
-      if (!window.THREE) return null;
-      const canvas = document.getElementById("scene");
-      let renderer;
-      try { renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true }); }
-      catch (e) { return null; }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-      camera.position.set(0, 0.15, 5.7);
-
-      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-      const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(3, 5, 4); scene.add(key);
-      const rim = new THREE.DirectionalLight(0x9fe6ff, 0.55); rim.position.set(-4, 2, -3); scene.add(rim);
-      const glow = new THREE.PointLight(0xffffff, 0.5); glow.position.set(0, 1, 3); scene.add(glow);
-
-      const G = window.gsap;
-      const toothGroup = new THREE.Group(); scene.add(toothGroup);
-
-      // răng — lathe + hơi dẹt trước-sau cho tự nhiên, men bóng (physical + clearcoat)
-      const prof = [[0.02,-1.75],[0.26,-1.5],[0.4,-1.05],[0.5,-0.55],[0.56,-0.1],[0.7,0.22],[0.85,0.5],[0.86,0.76],[0.72,1.0],[0.42,1.14],[0.13,1.2],[0.0,1.22]];
-      const pts = prof.map(p => new THREE.Vector2(p[0], p[1]));
-      const toothGeo = new THREE.LatheGeometry(pts, 64); toothGeo.computeVertexNormals();
-      const toothMat = new THREE.MeshPhysicalMaterial({ color: 0xe7d9ba, roughness: 0.25, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.18 });
-      const tooth = new THREE.Mesh(toothGeo, toothMat);
-      tooth.scale.set(1.25, 1.25, 0.92);
-      toothGroup.add(tooth);
-
-      // bóng đổ tiếp xúc (contact shadow)
-      const sc = document.createElement("canvas"); sc.width = sc.height = 128;
-      const sctx = sc.getContext("2d");
-      const rg = sctx.createRadialGradient(64,64,4,64,64,62);
-      rg.addColorStop(0,"rgba(0,0,0,0.33)"); rg.addColorStop(1,"rgba(0,0,0,0)");
-      sctx.fillStyle = rg; sctx.fillRect(0,0,128,128);
-      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.2,4.2),
-        new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
-      shadow.rotation.x = -Math.PI/2; shadow.position.y = -2.15; scene.add(shadow);
-
-      // vôi răng
-      const tartar = []; const N = 20;
-      for (let i = 0; i < N; i++) {
-        const th = Math.random()*Math.PI*2;
-        const y = (-0.15 + Math.random()*0.7) * 1.25;
-        const r = (0.6 + Math.random()*0.18);
-        const size = 0.09 + Math.random()*0.09;
-        const geo = new THREE.IcosahedronGeometry(size, 0);
-        const pp = geo.attributes.position;
-        for (let v = 0; v < pp.count; v++) pp.setXYZ(v, pp.getX(v)*(0.7+Math.random()*0.6), pp.getY(v)*(0.7+Math.random()*0.6), pp.getZ(v)*(0.7+Math.random()*0.6));
-        geo.computeVertexNormals();
-        const mat = new THREE.MeshStandardMaterial({ color: i%3===0?0xb9975a:0xd3ba7e, roughness: 0.95, metalness: 0, transparent: true });
-        const m = new THREE.Mesh(geo, mat);
-        m.position.set(Math.cos(th)*r*1.25, y, Math.sin(th)*r*0.92);
-        toothGroup.add(m); tartar.push(m);
-      }
-
-      // đầu cạo siêu âm
-      const metal = new THREE.MeshStandardMaterial({ color: 0xcfd6dd, roughness: 0.22, metalness: 0.9 });
-      const scaler = new THREE.Group();
-      scaler.add(new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.055,1.2,20), metal));
-      const tip = new THREE.Mesh(new THREE.CylinderGeometry(0.012,0.05,0.4,14), metal); tip.position.y=-0.72; scaler.add(tip);
-      scaler.position.set(1.15,0.55,1.3); scaler.rotation.set(-0.35,0,Math.PI*0.3); scaler.scale.setScalar(0);
-      scene.add(scaler); let scalerActive = false;
-
-      // lấp lánh
-      const sN=70, sp=new Float32Array(sN*3);
-      for (let i=0;i<sN;i++){ const th=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1), rr=1.5+Math.random()*0.7;
-        sp[i*3]=Math.sin(ph)*Math.cos(th)*rr; sp[i*3+1]=Math.cos(ph)*rr*1.2; sp[i*3+2]=Math.sin(ph)*Math.sin(th)*rr; }
-      const sGeo=new THREE.BufferGeometry(); sGeo.setAttribute("position", new THREE.BufferAttribute(sp,3));
-      const sMat=new THREE.PointsMaterial({ color:0xffffff, size:0.1, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending });
-      const sparkles=new THREE.Points(sGeo,sMat); toothGroup.add(sparkles);
-
-      function splash(){
-        for (let i=0;i<12;i++){
-          const d=new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8), new THREE.MeshStandardMaterial({color:0x7fd4ff,roughness:0.2,transparent:true}));
-          d.position.set(0.7+(Math.random()-0.5)*0.3, 0.2+(Math.random()-0.5)*0.3, 0.9+Math.random()*0.2); scene.add(d);
-          G&&G.to(d.position,{x:d.position.x+(Math.random()-0.5), y:d.position.y-1.2-Math.random(), z:d.position.z+0.3, duration:0.9+Math.random()*0.4, ease:"power1.in"});
-          G&&G.to(d.material,{opacity:0,duration:1,delay:0.3,onComplete:()=>{scene.remove(d);d.geometry.dispose();d.material.dispose();}});
-        }
-      }
-      function tweenColor(hex,dur){ const c=new THREE.Color(hex); if(G)G.to(toothMat.color,{r:c.r,g:c.g,b:c.b,duration:dur,ease:"power2.out"}); else toothMat.color.copy(c); }
-      function setStep(n){
-        const removed = n===0?0:(n===1?Math.floor(N*0.55):N);
-        tartar.forEach((m,i)=>{ const show=i>=removed, s=show?1:0;
-          if(G){ G.to(m.scale,{x:s,y:s,z:s,duration:0.5,ease:show?"back.out(2)":"back.in(2)",delay:(i%6)*0.03}); G.to(m.material,{opacity:show?1:0,duration:0.4}); }
-          else { m.scale.setScalar(s); m.material.opacity=s; } });
-        tweenColor(n===0?0xe7d9ba:n===1?0xf1e8d0:0xfdfdfb, 0.8);
-        scalerActive=(n===1);
-        if(G)G.to(scaler.scale,{x:scalerActive?1:0,y:scalerActive?1:0,z:scalerActive?1:0,duration:0.4,ease:"back.out(1.6)"}); else scaler.scale.setScalar(scalerActive?1:0);
-        if(n===1)splash();
-        if(n===2&&G){ G.fromTo(sMat,{opacity:0},{opacity:1,duration:0.5,yoyo:true,repeat:1}); G.fromTo(sparkles.scale,{x:0.7,y:0.7,z:0.7},{x:1.25,y:1.25,z:1.25,duration:1.3,ease:"power2.out"}); }
-      }
-
-      let dragging=false, px=0, py=0;
-      canvas.addEventListener("pointerdown",(e)=>{dragging=true;px=e.clientX;py=e.clientY;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
-      canvas.addEventListener("pointermove",(e)=>{ if(!dragging)return; toothGroup.rotation.y+=(e.clientX-px)*0.01; toothGroup.rotation.x=Math.max(-0.7,Math.min(0.7,toothGroup.rotation.x+(e.clientY-py)*0.008)); px=e.clientX;py=e.clientY; });
-      const stop=()=>dragging=false; canvas.addEventListener("pointerup",stop); canvas.addEventListener("pointercancel",stop);
-
-      function resize(){ const r=canvas.getBoundingClientRect(), w=Math.max(1,r.width), h=Math.max(1,r.height); renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
-      window.addEventListener("resize",resize); resize();
-      function animate(){ requestAnimationFrame(animate); const t=performance.now()*0.001;
-        if(!dragging) toothGroup.rotation.y+=0.004;
-        if(scalerActive){ scaler.position.x=1.02+Math.sin(t*11)*0.06; scaler.position.y=0.55+Math.cos(t*11)*0.04; }
-        sparkles.rotation.y+=0.003; renderer.render(scene,camera); }
-      animate();
-      return { setStep };
-    }
-
-    /* Stepper */
+    /* Stepper điều khiển slider */
     (function () {
-      const viz=document.getElementById("viz"), badge=document.getElementById("vizBadge");
+      const badge=document.getElementById("vizBadge");
+      const slides=document.getElementById("slides");
       const steps=[].slice.call(document.querySelectorAll(".step"));
       const dots=[].slice.call(document.querySelectorAll("#dots i"));
       const prev=document.getElementById("prev"), next=document.getElementById("next");
-      let cur=0, scene3d=null;
-      try{ scene3d=init3D(); }catch(e){ scene3d=null; }
-      if(!scene3d) viz.classList.add("no3d");
-      function go(n){ cur=Math.max(0,Math.min(2,n)); viz.setAttribute("data-step",cur); badge.textContent="Bước "+(cur+1);
-        steps.forEach((s,i)=>s.classList.toggle("active",i===cur)); dots.forEach((d,i)=>d.classList.toggle("on",i===cur));
-        prev.disabled=cur===0; next.disabled=cur===2; if(scene3d) scene3d.setStep(cur); }
+      let cur=0;
+      function go(n){
+        cur=Math.max(0,Math.min(2,n));
+        slides.style.transform="translateX("+(-cur*100)+"%)";
+        badge.textContent="Bước "+(cur+1);
+        steps.forEach((s,i)=>s.classList.toggle("active",i===cur));
+        dots.forEach((d,i)=>d.classList.toggle("on",i===cur));
+        prev.disabled=cur===0; next.disabled=cur===2;
+      }
       steps.forEach((s)=>s.addEventListener("click",()=>go(+s.dataset.step)));
       dots.forEach((d,i)=>d.addEventListener("click",()=>go(i)));
       prev.addEventListener("click",()=>go(cur-1)); next.addEventListener("click",()=>go(cur+1));
+      // kéo/vuốt để chuyển bước
+      let sx=null;
+      slides.parentElement.addEventListener("pointerdown",(e)=>sx=e.clientX);
+      slides.parentElement.addEventListener("pointerup",(e)=>{
+        if(sx===null)return; const dx=e.clientX-sx; sx=null;
+        if(Math.abs(dx)>40) go(cur+(dx<0?1:-1));
+      });
       go(0);
     })();
   </script>
