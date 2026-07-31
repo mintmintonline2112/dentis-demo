@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSD — Niềng răng</title>
+<script>
+  document.documentElement.classList.add("has-js");
+  try {
+    var _t = localStorage.getItem("ssd-nr-theme");
+    if (_t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+  } catch (e) {}
+</script>
+<link href="assets/fonts/fonts.css" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f6f5f1;
+    --surface:#ffffff;
+    --ink:#191a1f;
+    --muted:#63666f;
+    --line:rgba(25,26,31,.13);
+    --accent:#c69a4e;           /* vàng gold nha khoa */
+    --accent-soft:#f3ecdd;
+    --shadow:0 30px 70px -36px rgba(25,26,31,.4);
+  }
+  html[data-theme="dark"]{
+    --bg:#0e0f13;
+    --surface:#15171d;
+    --ink:#eceded;
+    --muted:#9297a1;
+    --line:rgba(255,255,255,.13);
+    --accent:#e0b56a;
+    --accent-soft:rgba(224,181,106,.13);
+    --shadow:0 30px 70px -32px rgba(0,0,0,.72);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Barlow",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden;transition:background-color .5s,color .5s}
+  a{color:inherit;text-decoration:none}
+  .cond{font-family:"Barlow Condensed",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(22px,5vw,64px)}
+
+  /* ===== Header ===== */
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:20px clamp(22px,5vw,64px)}
+  .brand{display:flex;align-items:flex-end;gap:4px;height:32px}
+  .brand span{width:3.5px;background:var(--ink);border-radius:1px;animation:eq 1.6s ease-in-out infinite;transition:background-color .5s}
+  .brand span:nth-child(1){height:60%}
+  .brand span:nth-child(2){height:100%;animation-delay:.15s}
+  .brand span:nth-child(3){height:44%;animation-delay:.3s}
+  .brand span:nth-child(4){height:78%;animation-delay:.45s}
+  .brand span:nth-child(5){height:30%;animation-delay:.6s}
+  .brand b{margin-left:12px;font-weight:600;letter-spacing:.28em;font-size:14px}
+  @keyframes eq{0%,100%{transform:scaleY(.7)}50%{transform:scaleY(1)}}
+  .theme-toggle{width:26px;height:26px;padding:0;background:none;border:none;cursor:pointer;color:var(--ink);opacity:.75;position:relative;transition:opacity .3s,transform .5s cubic-bezier(.2,.7,.2,1),color .5s}
+  .theme-toggle:hover{opacity:1;transform:rotate(20deg)}
+  .theme-toggle svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s,transform .45s}
+  .theme-toggle .icon-sun{opacity:1;transform:none}
+  .theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
+  html[data-theme="dark"] .theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
+  html[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;transform:none}
+
+  /* ===== Hero ===== */
+  .hero{padding:150px 0 40px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.3em;font-size:13px;color:var(--accent);margin-bottom:22px}
+  .eyebrow::before,.eyebrow::after{content:"";width:28px;height:1px;background:var(--accent)}
+  .hero h1{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(48px,9vw,120px);line-height:.95;letter-spacing:.01em}
+  .hero .lead{max-width:620px;margin:24px auto 0;color:var(--muted);font-size:clamp(16px,2vw,19px)}
+
+  /* ===== Before / After ===== */
+  .ba-section{padding:46px 0 80px}
+  .ba{
+    position:relative;max-width:840px;margin:0 auto;aspect-ratio:3/2;
+    border-radius:20px;overflow:hidden;user-select:none;touch-action:none;cursor:ew-resize;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+    --pos:50%;
+  }
+  .ba-layer{position:absolute;inset:0}
+  .ba-layer img,.ba-layer svg{width:100%;height:100%;object-fit:cover;display:block}
+  /* lớp "Trước" nằm trên, bị cắt theo --pos */
+  .ba-before{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+  .ba-label{
+    position:absolute;top:16px;z-index:3;
+    font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.18em;font-size:13px;
+    color:#fff;background:rgba(20,20,22,.55);backdrop-filter:blur(4px);
+    padding:6px 14px;border-radius:20px;
+  }
+  .ba-label.before{left:16px}
+  .ba-label.after{right:16px}
+  /* thanh kéo */
+  .ba-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;transform:translateX(-1px);z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+  .ba-knob{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:48px;height:48px;border-radius:50%;background:#fff;color:#1a1a1a;
+    display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.28);cursor:ew-resize;
+    transition:transform .2s}
+  .ba:active .ba-knob{transform:translate(-50%,-50%) scale(.94)}
+  .ba-knob svg{width:22px;height:22px}
+  .ba-hint{text-align:center;margin-top:18px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.2em;font-size:12px;color:var(--muted)}
+
+  /* ===== Cards ===== */
+  .section{padding:70px 0}
+  .sec-head{text-align:center;margin-bottom:50px}
+  .sec-head .kk{font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.3em;font-size:12px;color:var(--accent);margin-bottom:14px}
+  .sec-head h2{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(30px,5vw,60px);line-height:1}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:34px 28px;transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s}
+  .card::before{content:"";display:block;width:40px;height:3px;background:var(--accent);margin-bottom:20px;border-radius:2px}
+  .card:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+  .card h3{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin-bottom:10px}
+  .card p{font-size:15px;color:var(--muted)}
+
+  /* ===== CTA / footer ===== */
+  .cta{text-align:center;padding:80px 0}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.12em;font-size:15px;font-weight:500;padding:15px 34px;border-radius:40px;background:var(--accent);color:#1a1200;cursor:pointer;transition:transform .3s}
+  .btn:hover{transform:translateY(-3px)}
+  footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;color:var(--muted);font-family:"Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+
+  @media (prefers-reduced-motion: reduce){.brand span{animation:none}}
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="SSD"><span></span><span></span><span></span><span></span><span></span><b class="cond">SSD</b></a>
+    <button class="theme-toggle" type="button" aria-label="Chuyển chế độ sáng/tối" title="Sáng/Tối">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <span class="eyebrow">Chỉnh nha thẩm mỹ</span>
+      <h1>Niềng răng</h1>
+      <p class="lead">Đưa từng chiếc răng về đúng vị trí — cho nụ cười đều, khớp cắn chuẩn và gương mặt hài hoà hơn.</p>
+    </section>
+
+    <!-- ============ BEFORE / AFTER ============ -->
+    <section class="ba-section wrap">
+      <div class="ba" id="ba">
+        <!-- SAU (nằm dưới, luôn hiện) -->
+        <div class="ba-layer ba-after">
+          <img src="images/nieng-sau.jpg" alt="Sau khi niềng — răng đều, trắng" draggable="false">
+        </div>
+        <!-- TRƯỚC (nằm trên, bị cắt theo thanh kéo) -->
+        <div class="ba-layer ba-before">
+          <img src="images/nieng-truoc.jpg" alt="Trước khi niềng — răng khấp khểnh" draggable="false">
+        </div>
+
+        <span class="ba-label before">Trước</span>
+        <span class="ba-label after">Sau</span>
+
+        <div class="ba-handle" id="baHandle">
+          <div class="ba-knob">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+      </div>
+      <p class="ba-hint">◂ Kéo để so sánh Trước / Sau ▸</p>
+    </section>
+
+    <!-- ============ Loại niềng ============ -->
+    <section class="section wrap">
+      <div class="sec-head">
+        <p class="kk">Giải pháp</p>
+        <h2>Các phương pháp niềng</h2>
+      </div>
+      <div class="cards">
+        <div class="card"><h3>Mắc cài kim loại</h3><p>Bền, hiệu quả cao với chi phí hợp lý — lựa chọn kinh điển cho mọi ca chỉnh nha.</p></div>
+        <div class="card"><h3>Mắc cài sứ</h3><p>Màu sứ trùng răng, thẩm mỹ hơn mắc cài kim loại mà vẫn giữ hiệu quả tốt.</p></div>
+        <div class="card"><h3>Khay trong suốt</h3><p>Gần như vô hình, tháo lắp linh hoạt, ăn nhai và vệ sinh dễ dàng.</p></div>
+      </div>
+    </section>
+
+    <section class="cta wrap">
+      <div class="sec-head" style="margin-bottom:26px">
+        <p class="kk">Bắt đầu</p>
+        <h2>Đặt lịch tư vấn niềng răng</h2>
+      </div>
+      <a class="btn" href="tel:+84000000000">Gọi đặt lịch ngay</a>
+    </section>
+  </main>
+
+  <footer>© 2026 SSD — Studio of Smile Design</footer>
+
+  <script>
+    /* Theme */
+    (function () {
+      const root = document.documentElement, btn = document.querySelector(".theme-toggle");
+      function apply(t){ t==="dark"?root.setAttribute("data-theme","dark"):root.removeAttribute("data-theme"); btn.setAttribute("aria-pressed",String(t==="dark")); try{localStorage.setItem("ssd-nr-theme",t);}catch(e){} }
+      apply(root.getAttribute("data-theme")==="dark"?"dark":"light");
+      btn.addEventListener("click",()=>apply(root.getAttribute("data-theme")==="dark"?"light":"dark"));
+    })();
+
+    /* Before / After slider */
+    (function () {
+      const ba = document.getElementById("ba");
+      if (!ba) return;
+      let dragging = false;
+      const setPos = (clientX) => {
+        const r = ba.getBoundingClientRect();
+        let p = ((clientX - r.left) / r.width) * 100;
+        p = Math.max(0, Math.min(100, p));
+        ba.style.setProperty("--pos", p + "%");
+      };
+      ba.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        try { ba.setPointerCapture(e.pointerId); } catch (_) {}
+        setPos(e.clientX);
+      });
+      ba.addEventListener("pointermove", (e) => { if (dragging) setPos(e.clientX); });
+      const stop = () => { dragging = false; };
+      ba.addEventListener("pointerup", stop);
+      ba.addEventListener("pointercancel", stop);
+      // phím mũi tên khi focus
+      ba.tabIndex = 0;
+      ba.addEventListener("keydown", (e) => {
+        const cur = parseFloat(getComputedStyle(ba).getPropertyValue("--pos")) || 50;
+        if (e.key === "ArrowLeft") ba.style.setProperty("--pos", Math.max(0, cur - 4) + "%");
+        if (e.key === "ArrowRight") ba.style.setProperty("--pos", Math.min(100, cur + 4) + "%");
+      });
+    })();
+  </script>
+
+</body>
+</html>

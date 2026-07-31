@@ -466,10 +466,12 @@
   <!-- MENU VÒNG CUNG -->
   <nav class="arc" id="mainmenu" aria-label="Menu chính">
     <div class="spoke" style="--deg:-60deg"><a href="#dichvu">Dịch vụ</a></div>
-    <div class="spoke" style="--deg:-48deg"><a href="#doingu">Đội ngũ SSD</a></div>
-    <div class="spoke" style="--deg:-36deg"><a href="#thuvien">Thư viện ảnh</a></div>
-    <div class="spoke" style="--deg:-24deg"><a href="#kienthuc">Kiến thức nha khoa</a></div>
-    <div class="spoke" style="--deg:-12deg"><a href="#dathen">Đặt hẹn khám</a></div>
+    <div class="spoke" style="--deg:-52deg"><a href="nieng-rang.html">Niềng răng</a></div>
+    <div class="spoke" style="--deg:-44deg"><a href="cao-voi-rang.html">Cạo vôi răng</a></div>
+    <div class="spoke" style="--deg:-35deg"><a href="#doingu">Đội ngũ SSD</a></div>
+    <div class="spoke" style="--deg:-27deg"><a href="#thuvien">Thư viện ảnh</a></div>
+    <div class="spoke" style="--deg:-18deg"><a href="#kienthuc">Kiến thức nha khoa</a></div>
+    <div class="spoke" style="--deg:-9deg"><a href="#dathen">Đặt hẹn khám</a></div>
     <div class="spoke" style="--deg:-1deg"><a href="#lienhe">Liên hệ</a></div>
   </nav>
 
@@ -787,7 +789,9 @@
       // fallback tối thiểu: click menu để mở panel bằng CSS class
       document.querySelectorAll('.spoke a, a[href^="#"]').forEach((a) => {
         a.addEventListener("click", (e) => {
-          const id = a.getAttribute("href").slice(1);
+          const href = a.getAttribute("href");
+          if (!href.startsWith("#")) return;   // link sang trang khác (vd niềng răng) → điều hướng bình thường
+          const id = href.slice(1);
           e.preventDefault();
           document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
           document.documentElement.classList.remove("panel-open");
