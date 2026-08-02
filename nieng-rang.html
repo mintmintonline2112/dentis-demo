@@ -7,31 +7,34 @@
 <script>
   document.documentElement.classList.add("has-js");
   try {
-    var _t = localStorage.getItem("ssd-nr-theme");
-    if (_t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+    var _t = localStorage.getItem("ssd-theme");
+    if (_t === "light") document.documentElement.setAttribute("data-theme", "light");
   } catch (e) {}
 </script>
 <link href="assets/fonts/fonts.css" rel="stylesheet" />
 <style>
   :root{
-    --bg:#f6f5f1;
-    --surface:#ffffff;
-    --ink:#191a1f;
-    --muted:#63666f;
-    --line:rgba(25,26,31,.13);
-    --accent:#c69a4e;           /* vàng gold nha khoa */
-    --accent-soft:#f3ecdd;
-    --shadow:0 30px 70px -36px rgba(25,26,31,.4);
-  }
-  html[data-theme="dark"]{
-    --bg:#0e0f13;
-    --surface:#15171d;
-    --ink:#eceded;
-    --muted:#9297a1;
-    --line:rgba(255,255,255,.13);
-    --accent:#e0b56a;
-    --accent-soft:rgba(224,181,106,.13);
+    /* Cùng bảng màu dark mặc định với landing-1.html */
+    --bg:#0b0b0d;
+    --surface:#0b0b0d;
+    --ink:#e9e9ea;
+    --muted:#8a8a8f;
+    --accent:#d9d9dc;
+    --accent-soft:#131316;
+    --card-hover:#131316;
+    --line:rgba(255,255,255,.14);
     --shadow:0 30px 70px -32px rgba(0,0,0,.72);
+  }
+  html[data-theme="light"]{
+    --bg:#f4f4f5;
+    --surface:#f4f4f5;
+    --ink:#17171a;
+    --muted:#5f5f66;
+    --accent:#2a2a30;
+    --accent-soft:#e9e9ec;
+    --card-hover:#e9e9ec;
+    --line:rgba(0,0,0,.14);
+    --shadow:0 30px 70px -36px rgba(19,20,24,.4);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -54,13 +57,18 @@
   .theme-toggle{width:26px;height:26px;padding:0;background:none;border:none;cursor:pointer;color:var(--ink);opacity:.75;position:relative;transition:opacity .3s,transform .5s cubic-bezier(.2,.7,.2,1),color .5s}
   .theme-toggle:hover{opacity:1;transform:rotate(20deg)}
   .theme-toggle svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .35s,transform .45s}
-  .theme-toggle .icon-sun{opacity:1;transform:none}
-  .theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
-  html[data-theme="dark"] .theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
-  html[data-theme="dark"] .theme-toggle .icon-moon{opacity:1;transform:none}
+  .theme-toggle .icon-sun{opacity:0;transform:scale(.5) rotate(-90deg)}
+  .theme-toggle .icon-moon{opacity:1;transform:none}
+  html[data-theme="light"] .theme-toggle .icon-sun{opacity:1;transform:none}
+  html[data-theme="light"] .theme-toggle .icon-moon{opacity:0;transform:scale(.5) rotate(90deg)}
 
   /* ===== Hero ===== */
   .hero{padding:150px 0 40px;text-align:center}
+  .breadcrumb{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;color:var(--muted);font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.2em;font-size:12px}
+  .breadcrumb a{opacity:.8;transition:opacity .25s,color .25s}
+  .breadcrumb a:hover{opacity:1;color:var(--ink)}
+  .breadcrumb .sep{opacity:.5}
+  .breadcrumb .cur{color:var(--accent)}
   .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.3em;font-size:13px;color:var(--accent);margin-bottom:22px}
   .eyebrow::before,.eyebrow::after{content:"";width:28px;height:1px;background:var(--accent)}
   .hero h1{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(48px,9vw,120px);line-height:.95;letter-spacing:.01em}
@@ -81,21 +89,35 @@
   .ba-label{
     position:absolute;top:16px;z-index:3;
     font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.18em;font-size:13px;
-    color:#fff;background:rgba(20,20,22,.55);backdrop-filter:blur(4px);
-    padding:6px 14px;border-radius:20px;
+    color:var(--ink);background:color-mix(in srgb,var(--bg) 60%,transparent);backdrop-filter:blur(4px);
+    padding:6px 14px;border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);border-radius:20px;
   }
   .ba-label.before{left:16px}
   .ba-label.after{right:16px}
   /* thanh kéo */
-  .ba-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;transform:translateX(-1px);z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+  .ba-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:var(--ink);transform:translateX(-1px);z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
   .ba-knob{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:48px;height:48px;border-radius:50%;background:#fff;color:#1a1a1a;
+    width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);
     display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.28);cursor:ew-resize;
     transition:transform .2s}
   .ba:active .ba-knob{transform:translate(-50%,-50%) scale(.94)}
   .ba-knob svg{width:22px;height:22px}
   .ba-hint{text-align:center;margin-top:18px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.2em;font-size:12px;color:var(--muted)}
+
+  /* ===== Orthodontic gallery ===== */
+  .ortho-gallery{padding:70px 0}
+  .ortho-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+  .ortho-shot{position:relative;aspect-ratio:4/3;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--card-hover)}
+  .ortho-shot::after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(180deg,transparent,rgba(5,5,6,.82));pointer-events:none}
+  .ortho-shot img{width:100%;height:100%;display:block;object-fit:cover;filter:saturate(.82) contrast(1.02);transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .5s}
+  .ortho-shot:hover img{transform:scale(1.045);filter:saturate(1) contrast(1.02)}
+  .ortho-shot figcaption{position:absolute;left:24px;right:24px;bottom:22px;z-index:1;color:#fff}
+  .ortho-shot .photo-no{display:block;margin-bottom:7px;font-family:"Barlow Condensed";font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.68)}
+  .ortho-shot h3{font-family:"Barlow Condensed";font-size:clamp(22px,3vw,30px);font-weight:600;line-height:1;text-transform:uppercase}
+  .ortho-shot .credit{display:inline-block;margin-top:9px;font-family:"Barlow Condensed";font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.68);transition:color .25s}
+  .ortho-shot .credit:hover{color:#fff}
+  @media(max-width:700px){.ortho-grid{grid-template-columns:1fr}.ortho-shot{aspect-ratio:4/3}}
 
   /* ===== Cards ===== */
   .section{padding:70px 0}
@@ -103,15 +125,15 @@
   .sec-head .kk{font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.3em;font-size:12px;color:var(--accent);margin-bottom:14px}
   .sec-head h2{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:clamp(30px,5vw,60px);line-height:1}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:34px 28px;transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:34px 28px;transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s,background-color .3s,border-color .3s}
   .card::before{content:"";display:block;width:40px;height:3px;background:var(--accent);margin-bottom:20px;border-radius:2px}
-  .card:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+  .card:hover{transform:translateY(-8px);box-shadow:var(--shadow);background:var(--card-hover);border-color:color-mix(in srgb,var(--ink) 35%,transparent)}
   .card h3{font-family:"Barlow Condensed";font-weight:600;text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin-bottom:10px}
   .card p{font-size:15px;color:var(--muted)}
 
   /* ===== CTA / footer ===== */
   .cta{text-align:center;padding:80px 0}
-  .btn{display:inline-flex;align-items:center;gap:10px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.12em;font-size:15px;font-weight:500;padding:15px 34px;border-radius:40px;background:var(--accent);color:#1a1200;cursor:pointer;transition:transform .3s}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:"Barlow Condensed";text-transform:uppercase;letter-spacing:.12em;font-size:15px;font-weight:500;padding:15px 34px;border-radius:40px;background:var(--accent);color:var(--bg);cursor:pointer;transition:transform .3s,background-color .3s,color .3s}
   .btn:hover{transform:translateY(-3px)}
   footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;color:var(--muted);font-family:"Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;font-size:12px}
 
@@ -130,6 +152,13 @@
 
   <main id="top">
     <section class="hero wrap">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="landing-1.html">Trang chủ</a>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="landing-1.html#dichvu">Dịch vụ</a>
+        <span class="sep" aria-hidden="true">/</span>
+        <span class="cur" aria-current="page">Niềng răng</span>
+      </nav>
       <span class="eyebrow">Chỉnh nha thẩm mỹ</span>
       <h1>Niềng răng</h1>
       <p class="lead">Đưa từng chiếc răng về đúng vị trí — cho nụ cười đều, khớp cắn chuẩn và gương mặt hài hoà hơn.</p>
@@ -157,6 +186,32 @@
         </div>
       </div>
       <p class="ba-hint">◂ Kéo để so sánh Trước / Sau ▸</p>
+    </section>
+
+    <!-- ============ HÌNH ẢNH CHỈNH NHA ============ -->
+    <section class="ortho-gallery wrap" aria-labelledby="ortho-gallery-title">
+      <div class="sec-head">
+        <p class="kk">Hình ảnh chỉnh nha</p>
+        <h2 id="ortho-gallery-title">Cận cảnh niềng răng</h2>
+      </div>
+      <div class="ortho-grid">
+        <figure class="ortho-shot">
+          <img src="images/nieng-rang-mac-cai.jpg" alt="Bác sĩ kiểm tra mắc cài kim loại trên răng bệnh nhân" loading="lazy" decoding="async">
+          <figcaption>
+            <span class="photo-no">01 — Điều trị thực tế</span>
+            <h3>Kiểm tra mắc cài</h3>
+            <a class="credit" href="https://unsplash.com/photos/person-with-silver-teeth-braces-hKaYlAF1nDw" target="_blank" rel="noopener noreferrer">Ảnh: Atikah Akhtar / Unsplash</a>
+          </figcaption>
+        </figure>
+        <figure class="ortho-shot">
+          <img src="images/nieng-rang-mo-hinh.jpg" alt="Mô hình hàm răng được gắn mắc cài kim loại" loading="lazy" decoding="async">
+          <figcaption>
+            <span class="photo-no">02 — Khí cụ chỉnh nha</span>
+            <h3>Cấu tạo mắc cài</h3>
+            <a class="credit" href="https://unsplash.com/photos/a-close-up-of-a-tooth-with-braces-on-it-P8ernb_Ht-M" target="_blank" rel="noopener noreferrer">Ảnh: Katarzyna Zygnerska / Unsplash</a>
+          </figcaption>
+        </figure>
+      </div>
     </section>
 
     <!-- ============ Loại niềng ============ -->
@@ -187,9 +242,9 @@
     /* Theme */
     (function () {
       const root = document.documentElement, btn = document.querySelector(".theme-toggle");
-      function apply(t){ t==="dark"?root.setAttribute("data-theme","dark"):root.removeAttribute("data-theme"); btn.setAttribute("aria-pressed",String(t==="dark")); try{localStorage.setItem("ssd-nr-theme",t);}catch(e){} }
-      apply(root.getAttribute("data-theme")==="dark"?"dark":"light");
-      btn.addEventListener("click",()=>apply(root.getAttribute("data-theme")==="dark"?"light":"dark"));
+      function apply(t){ t==="light"?root.setAttribute("data-theme","light"):root.removeAttribute("data-theme"); btn.setAttribute("aria-pressed",String(t==="light")); try{localStorage.setItem("ssd-theme",t);}catch(e){} }
+      apply(root.getAttribute("data-theme")==="light"?"light":"dark");
+      btn.addEventListener("click",()=>apply(root.getAttribute("data-theme")==="light"?"dark":"light"));
     })();
 
     /* Before / After slider */
