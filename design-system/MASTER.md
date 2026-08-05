@@ -250,6 +250,12 @@ Khối gradient `linear-gradient(120deg, var(--accent), var(--accent-2))`, radiu
 ### 7.17 Footer
 Viền trên `--line`, Condensed 12px uppercase `letter-spacing: .14em`, màu `--muted`, căn giữa: `© 2026 SSD — Studio of Smile Design`.
 
+### 7.18 Subhero (hero chuẩn cho trang phụ)
+`.subhero` (trong BASE + SHARED): `padding: 150px 0 40px`, căn giữa; chứa breadcrumb (tự căn giữa) → `.eyebrow` → `h1` (Condensed 600, `clamp(44px, 8vw, 110px)`) → `.hero-lead`. Mọi trang phụ mới dùng component này thay vì tự chế hero.
+
+### 7.19 Card dạng link
+`a.card` (display:block) + `.card-more` ("Xem chi tiết →", Condensed 12px uppercase, gạch chân dưới, hover giãn gap) — dùng cho danh sách giải pháp/kênh liên hệ có thể bấm.
+
 ---
 
 ## 8. Icon & Minh hoạ
@@ -288,6 +294,21 @@ Viền trên `--line`, Condensed 12px uppercase `letter-spacing: .14em`, màu `-
 ---
 
 ## 11. Cấu trúc trang chuẩn (khi thêm trang dịch vụ mới)
+
+### Sơ đồ site
+
+| Trang | File | Body class |
+|---|---|---|
+| Trang chủ (SPA menu vòng cung) | `landing-1.html` | `page-landing` |
+| Về Dr. Đỗ Thái Long (Về chúng tôi) | `ve-chung-toi.html` | `page-ve-chung-toi` |
+| Giải pháp điều trị (hub dịch vụ) | `giai-phap-dieu-tri.html` | `page-giai-phap` |
+| ├─ Niềng răng | `nieng-rang.html` | `page-nieng` |
+| └─ Cạo vôi răng | `cao-voi-rang.html` | `page-caovoi` |
+| Ca điều trị (trước/sau) | `ca-dieu-tri.html` | `page-ca-dieu-tri` |
+| Kiến thức y khoa (blog) | `kien-thuc-y-khoa.html` | `page-kien-thuc` |
+| Liên hệ tư vấn | `lien-he.html` | `page-lien-he` |
+
+Menu vòng cung ở landing trỏ tới 5 trang chính (Về chúng tôi · Giải pháp · Ca điều trị · Kiến thức · Liên hệ); trang dịch vụ con liên kết từ hub Giải pháp điều trị.
 
 ```
 <html lang="vi">

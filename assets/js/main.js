@@ -2,10 +2,9 @@
    SSD — Studio of Smile Design · main.js (toàn bộ JS của site)
    Load ở cuối <body>, SAU các file vendor (gsap...) nếu trang cần.
    Cấu trúc:
-     1. SHARED   — chạy mọi trang (theme toggle, topbar cuộn)
+     1. SHARED   — chạy mọi trang (theme toggle, topbar cuộn, compare slider)
      2. LANDING  — chỉ chạy khi <body class="page-landing">
-     3. NIỀNG RĂNG — chỉ chạy khi <body class="page-nieng">
-     4. CẠO VÔI RĂNG — chỉ chạy khi <body class="page-caovoi">
+     3. CẠO VÔI RĂNG — chỉ chạy khi <body class="page-caovoi">
    Quy ước: JS chỉ toggle class trạng thái `is-*`; bám phần tử qua id / data-*.
    ========================================================================== */
 
@@ -38,6 +37,35 @@
   const on = () => tb.classList.toggle("is-scrolled", window.scrollY > 40);
   on();
   window.addEventListener("scroll", on, { passive: true });
+})();
+
+/* ---- Compare slider Trước/Sau (niềng răng + ca điều trị) ---- */
+(function () {
+  const ba = document.getElementById("ba");
+  if (!ba) return;
+  let dragging = false;
+  const setPos = (clientX) => {
+    const r = ba.getBoundingClientRect();
+    let p = ((clientX - r.left) / r.width) * 100;
+    p = Math.max(0, Math.min(100, p));
+    ba.style.setProperty("--pos", p + "%");
+  };
+  ba.addEventListener("pointerdown", (e) => {
+    dragging = true;
+    try { ba.setPointerCapture(e.pointerId); } catch (_) {}
+    setPos(e.clientX);
+  });
+  ba.addEventListener("pointermove", (e) => { if (dragging) setPos(e.clientX); });
+  const stop = () => { dragging = false; };
+  ba.addEventListener("pointerup", stop);
+  ba.addEventListener("pointercancel", stop);
+  // phím mũi tên khi focus
+  ba.tabIndex = 0;
+  ba.addEventListener("keydown", (e) => {
+    const cur = parseFloat(getComputedStyle(ba).getPropertyValue("--pos")) || 50;
+    if (e.key === "ArrowLeft") ba.style.setProperty("--pos", Math.max(0, cur - 4) + "%");
+    if (e.key === "ArrowRight") ba.style.setProperty("--pos", Math.min(100, cur + 4) + "%");
+  });
 })();
 
 /* ==========================================================================
@@ -284,41 +312,7 @@ if (document.body.classList.contains("page-landing")) {
 }
 
 /* ==========================================================================
-   3. NIỀNG RĂNG — nieng-rang.html
-   ========================================================================== */
-if (document.body.classList.contains("page-nieng")) {
-  /* ---- Before / After slider ---- */
-  (function () {
-    const ba = document.getElementById("ba");
-    if (!ba) return;
-    let dragging = false;
-    const setPos = (clientX) => {
-      const r = ba.getBoundingClientRect();
-      let p = ((clientX - r.left) / r.width) * 100;
-      p = Math.max(0, Math.min(100, p));
-      ba.style.setProperty("--pos", p + "%");
-    };
-    ba.addEventListener("pointerdown", (e) => {
-      dragging = true;
-      try { ba.setPointerCapture(e.pointerId); } catch (_) {}
-      setPos(e.clientX);
-    });
-    ba.addEventListener("pointermove", (e) => { if (dragging) setPos(e.clientX); });
-    const stop = () => { dragging = false; };
-    ba.addEventListener("pointerup", stop);
-    ba.addEventListener("pointercancel", stop);
-    // phím mũi tên khi focus
-    ba.tabIndex = 0;
-    ba.addEventListener("keydown", (e) => {
-      const cur = parseFloat(getComputedStyle(ba).getPropertyValue("--pos")) || 50;
-      if (e.key === "ArrowLeft") ba.style.setProperty("--pos", Math.max(0, cur - 4) + "%");
-      if (e.key === "ArrowRight") ba.style.setProperty("--pos", Math.min(100, cur + 4) + "%");
-    });
-  })();
-}
-
-/* ==========================================================================
-   4. CẠO VÔI RĂNG — cao-voi-rang.html
+   3. CẠO VÔI RĂNG — cao-voi-rang.html
    ========================================================================== */
 if (document.body.classList.contains("page-caovoi")) {
   /* ---- Stepper điều khiển slider quy trình ---- */

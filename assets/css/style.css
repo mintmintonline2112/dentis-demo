@@ -137,6 +137,15 @@ html[data-theme="light"] .theme-toggle .icon-moon{opacity:0;transform:scale(.5) 
   font-size:clamp(30px,4.6vw,60px);line-height:1;
 }
 
+/* ----- Subhero (hero căn giữa cho các trang phụ) ----- */
+.subhero{padding:150px 0 40px;text-align:center}
+.subhero .breadcrumb{justify-content:center}
+.subhero h1{
+  font-family:"Barlow Condensed",sans-serif;font-weight:600;text-transform:uppercase;
+  font-size:clamp(44px,8vw,110px);line-height:.95;letter-spacing:.01em;
+}
+.subhero .hero-lead{max-width:620px;margin:24px auto 0;color:var(--muted);font-size:clamp(16px,2vw,19px)}
+
 /* ----- Nút (pill) ----- */
 .btn{
   display:inline-flex;align-items:center;gap:10px;
@@ -635,3 +644,20 @@ html.is-panel-open .arc{opacity:0;visibility:hidden;pointer-events:none;transiti
 .band .btn-solid:hover{background:color-mix(in srgb,var(--bg) 88%,var(--ink))}
 
 .page-caovoi footer{margin-top:70px}
+
+/* ==========================================================================
+   6. CÁC TRANG PHỤ — ve-chung-toi · giai-phap-dieu-tri · ca-dieu-tri ·
+      kien-thuc-y-khoa · lien-he (dùng subhero + component shared, chỉ thêm ít CSS riêng)
+   ========================================================================== */
+/* card dạng link (giải pháp điều trị) */
+a.card{display:block}
+.card-more{
+  margin-top:16px;display:inline-flex;align-items:center;gap:8px;
+  font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:var(--ink);
+  border-bottom:1px solid var(--line);padding-bottom:4px;transition:gap .3s,border-color .3s;
+}
+a.card:hover .card-more{gap:14px;border-color:var(--ink)}
+
+/* trang kết thúc bằng CTA band → đẩy footer xuống chút */
+.page-giai-phap footer,
+.page-lien-he footer{margin-top:70px}
