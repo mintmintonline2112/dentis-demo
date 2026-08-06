@@ -220,38 +220,12 @@ if (document.body.classList.contains("page-landing")) {
     window.addEventListener("pointercancel", release);
   })();
 
-  /* ---- Menu vòng cung + panel (GSAP; có fallback không thư viện) ---- */
+  /* ---- Intro khi tải: logo, mặt số, MENU XOÈ RA (menu trỏ ra các trang riêng) ---- */
   if (!window.gsap) {
-    // Không có thư viện → hiện mọi thứ (menu + panel vẫn dùng được, chỉ không có hiệu ứng).
+    // Không có thư viện → hiện logo + menu ngay (spoke là link .html, điều hướng bình thường)
     document.documentElement.classList.remove("has-js");
-    // fallback tối thiểu: click menu để mở panel bằng CSS class
-    document.querySelectorAll('.spoke a, a[href^="#"]').forEach((a) => {
-      a.addEventListener("click", (e) => {
-        const href = a.getAttribute("href");
-        if (!href.startsWith("#")) return;   // link sang trang khác (vd niềng răng) → điều hướng bình thường
-        const id = href.slice(1);
-        e.preventDefault();
-        document.querySelectorAll(".panel").forEach((p) => p.classList.remove("is-active"));
-        document.documentElement.classList.remove("is-panel-open");
-        if (id && id !== "home") {
-          const p = document.getElementById(id);
-          if (p) { p.classList.add("is-active"); document.documentElement.classList.add("is-panel-open"); }
-        }
-      });
-    });
-    const cb = document.querySelector(".panel-close");
-    if (cb) cb.addEventListener("click", () => {
-      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("is-active"));
-      document.documentElement.classList.remove("is-panel-open");
-    });
   } else {
-    const root    = document.documentElement;
-    const spokes  = gsap.utils.toArray(".spoke");
-    const anchors = spokes.map((s) => s.querySelector("a"));
-    const panels  = gsap.utils.toArray(".panel");
-    const closeBtn = document.querySelector(".panel-close");
-
-    /* ---- Intro khi tải: logo, icon, mặt số, rồi MENU XOÈ RA (thường trực) ---- */
+    const spokes = gsap.utils.toArray(".spoke");
     if (reduce) {
       gsap.set([".brand", ".theme-toggle", ".dial-lens"], { opacity: 1 });
       spokes.forEach((s) => {
@@ -273,41 +247,6 @@ if (document.body.classList.contains("page-landing")) {
         gsap.from(s.querySelector("a"), { x: -22, duration: .7, ease: "power3.out", delay: .5 + i * .08 });
       });
     }
-
-    /* ---- Mở / đóng PANEL nội dung ---- */
-    function openPanel(id) {
-      const panel = document.getElementById(id);
-      if (!panel || !panel.classList.contains("panel")) return;
-      panels.forEach((p) => { if (p !== panel) p.classList.remove("is-active"); });
-      panel.classList.add("is-active");
-      panel.scrollTop = 0;
-      root.classList.add("is-panel-open");
-      anchors.forEach((a) => a.classList.toggle("is-current", a.getAttribute("href") === "#" + id));
-
-      const els = panel.querySelectorAll(".reveal");
-      if (reduce) gsap.set(els, { opacity: 1, y: 0 });
-      else gsap.fromTo(els,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: .7, ease: "power3.out", stagger: .09, delay: .12, overwrite: true });
-    }
-    function closePanel() {
-      panels.forEach((p) => p.classList.remove("is-active"));
-      root.classList.remove("is-panel-open");
-      anchors.forEach((a) => a.classList.remove("is-current"));
-    }
-
-    /* ---- Mọi link #... : #home = đóng/về trang chủ, còn lại mở panel tương ứng ---- */
-    document.querySelectorAll('a[href^="#"]').forEach((a) => {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        const id = a.getAttribute("href").slice(1);
-        if (!id || id === "home") closePanel();
-        else openPanel(id);
-      });
-    });
-
-    closeBtn.addEventListener("click", closePanel);
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePanel(); });
   }
 }
 

@@ -75,6 +75,8 @@ body{
 }
 a{color:inherit;text-decoration:none}
 .cond{font-family:"Barlow Condensed",sans-serif}
+/* ẩn khỏi mắt nhưng vẫn đọc được với screen reader / SEO (vd h1 ở landing) */
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(22px,5vw,64px)}
 
 /* ----- Topbar (trang con) ----- */
@@ -103,6 +105,7 @@ a{color:inherit;text-decoration:none}
 @keyframes eq{0%,100%{transform:scaleY(.7)}50%{transform:scaleY(1)}}
 
 /* ----- Logo thương hiệu: PNG đã tách nền → dùng làm mask, tô màu theo theme ----- */
+/* Logo ảnh — HIỆN CHỈ DÙNG Ở LANDING (trang con vẫn equalizer + chữ cho tới khi chốt logo) */
 .brand-logo{
   width:180px;height:70px;
   background-color:var(--ink);                          /* logo lấy màu chữ theme: trắng ở Dark, đen ở Light */
@@ -339,27 +342,7 @@ html.is-dial-dragging .spoke,html.is-dial-dragging .dial-lens{will-change:transf
 }
 .spoke a:hover::before{background:var(--fg);opacity:1;transform:translateY(-50%) scale(1)}
 
-/* ============ PANEL nội dung (ẩn sẵn, click menu mới hiện) ============ */
-.panel{
-  position:fixed;inset:0;z-index:25;
-  overflow-y:auto;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:120px clamp(30px,8vw,140px) 170px;
-  background:var(--bg);
-  opacity:0;visibility:hidden;transform:translateY(26px);
-  transition:opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1), visibility .55s, background-color .45s ease;
-}
-.panel.is-active{opacity:1;visibility:visible;transform:none}
-.panel h2{
-  font-family:"Barlow Condensed",sans-serif;font-weight:600;
-  font-size:clamp(38px,6vw,88px);letter-spacing:.02em;text-transform:uppercase;line-height:1;
-}
-.panel p{max-width:620px;margin-top:22px;color:var(--muted);font-size:18px;line-height:1.7}
-
-/* panel nhiều nội dung → canh từ trên xuống để không bị cắt đầu khi cuộn */
-#kienthuc.panel{justify-content:flex-start}
-
-/* ============ Blog / Kiến thức: danh sách bài viết ============ */
+/* ============ Blog / Kiến thức: danh sách bài viết (dùng ở kien-thuc-y-khoa) ============ */
 .blog-grid{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));
   gap:24px;margin-top:56px;max-width:1240px;
@@ -424,54 +407,15 @@ html.is-dial-dragging .spoke,html.is-dial-dragging .dial-lens{will-change:transf
 .pagination .pagination-btn.is-disabled{opacity:.35;cursor:not-allowed}
 .pagination .pagination-btn.is-disabled:hover{border-color:var(--line);color:var(--muted)}
 
-/* nút đóng panel (hiện khi có panel mở) */
-.panel-close{
-  position:fixed;top:26px;right:26px;z-index:45;
-  display:flex;align-items:center;gap:9px;
-  background:none;border:none;color:var(--fg);cursor:pointer;
-  font-family:"Barlow Condensed",sans-serif;font-size:14px;letter-spacing:.2em;text-transform:uppercase;
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s,color .3s,visibility .4s;
-}
-.panel-close .panel-close-x{position:relative;width:16px;height:16px}
-.panel-close .panel-close-x::before,.panel-close .panel-close-x::after{content:"";position:absolute;top:50%;left:0;width:100%;height:1.5px;background:currentColor}
-.panel-close .panel-close-x::before{transform:rotate(45deg)}
-.panel-close .panel-close-x::after{transform:rotate(-45deg)}
-html.is-panel-open .panel-close{opacity:1;visibility:visible;pointer-events:auto}
-html.is-panel-open .panel-close:hover{opacity:.7}
-/* dùng !important vì GSAP set opacity inline lên các nút này */
-html.is-panel-open .theme-toggle{opacity:0 !important;pointer-events:none}
-/* mở panel → ẩn Save + điểm chọn vị trí, chỉ chừa nút Đóng cho gọn */
-html.is-panel-open .save-btn{opacity:0 !important;pointer-events:none}
-html.is-panel-open .pos-picker{display:none}
-/* mở panel → ẩn menu vòng cung + mặt số cho đọc nội dung gọn (đóng lại menu hiện lại) */
-html.is-panel-open .dial,
-html.is-panel-open .arc{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease, visibility .35s}
-
-/* mục menu đang chọn */
-.spoke a.is-current{color:var(--fg)}
-.spoke a.is-current::before{background:var(--fg);opacity:1;transform:translateY(-50%) scale(1)}
-.page-landing .kicker{color:var(--muted);letter-spacing:.35em;margin-bottom:18px}
-
-/* card dùng chuẩn shared — landing chỉ thêm khoảng cách trên */
-.page-landing .cards{margin-top:50px}
-
-.contact-row{display:flex;flex-wrap:wrap;gap:40px;margin-top:40px}
-.contact-row a{color:var(--fg);text-decoration:none;font-size:20px;border-bottom:1px solid var(--line);padding-bottom:6px;transition:.3s}
-.contact-row a:hover{border-color:var(--fg)}
-
-/* dòng bản quyền nhỏ ở đáy panel */
-.panel .copyright{margin-top:60px;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-
 /* ============ Trạng thái ban đầu cho GSAP (chỉ khi có JS, chỉ landing) ============ */
 .has-js .spoke,
 .has-js .dial-lens,
 .has-js .page-landing .brand,
 .has-js .page-landing .theme-toggle{opacity:0}
-.has-js .panel .reveal{opacity:0}
 /* tôn trọng người tắt hiệu ứng */
 @media (prefers-reduced-motion: reduce){
   .has-js .spoke,.has-js .dial-lens,.has-js .page-landing .brand,
-  .has-js .page-landing .theme-toggle,.has-js .panel .reveal{opacity:1}
+  .has-js .page-landing .theme-toggle{opacity:1}
   .dial-lens .rot,.dial-lens .rot-rev,.dial-lens .arc-spin,.dial-lens .arc-spin2,.brand span{animation:none}
 }
 

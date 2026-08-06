@@ -1,6 +1,6 @@
-# SSD — Studio of Smile Design · Design System (MASTER)
+# Dr. Đỗ Long — Nha khoa chuyên khoa · Design System (MASTER)
 
-> Nguồn sự thật (source of truth) cho toàn bộ giao diện của website nha khoa SSD.
+> Nguồn sự thật (source of truth) cho toàn bộ giao diện của website nha khoa Dr. Đỗ Long.
 > Được trích xuất từ `landing-1.html`, `nieng-rang.html`, `cao-voi-rang.html`.
 > Mọi trang mới **phải** dùng token & component trong file này thay vì tự chế màu/số mới.
 
@@ -10,8 +10,9 @@
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Tên thương hiệu | **SSD — Studio of Smile Design** |
-| Lĩnh vực | Nha khoa thẩm mỹ ("thiết kế nụ cười") |
+| Tên thương hiệu | **Dr. Đỗ Long** (BS CK2 Đỗ Thái Long) |
+| Tagline / định vị | **Chuyên khoa Sâu răng · Phục hình · Nội nha** |
+| Lĩnh vực | Nha khoa chuyên khoa — điều trị sâu răng, phục hình, nội nha |
 | Triết lý | "Mỗi nụ cười là một thiết kế riêng" — tối giản, tinh tế, chăm chút như tác phẩm studio |
 | Phong cách thị giác | **Monochrome** (đen – xám – trắng), editorial, nhiều khoảng trống, chữ IN HOA tracking rộng |
 | Ngôn ngữ nội dung | Tiếng Việt (`<html lang="vi">`), giọng thân thiện – chuyên môn |
@@ -189,8 +190,11 @@ Quy tắc kèm theo:
 - Không đặt class mới trùng nghĩa với class đã có — tra bảng component bên dưới trước.
 - Tiền tố `page-` đã được dùng làm scope, nên **không** đặt tên block bắt đầu bằng `page-`.
 
-### 7.1 Brand logo (equalizer)
-5 `<span>` thanh dọc `width: 3.5–4px`, `background: var(--ink)`, cao 60/100/44/78/30%, animation `eq`. Trang con thêm chữ `SSD` (Condensed 600, `letter-spacing: .28em`, 14px).
+### 7.1 Brand logo
+Hai kiểu (đang song song vì **chưa chốt logo chính thức**):
+- **`.brand` (equalizer + chữ)** — 5 `<span>` thanh dọc `width: 3.5–4px`, `background: var(--ink)`, cao 60/100/44/78/30%, animation `eq`; trang con thêm chữ `Dr. Đỗ Long` (Condensed 600, `.28em`). **Đang dùng ở TẤT CẢ trang con.**
+- **`.brand.brand-logo` (logo ảnh)** — chỉ **landing** dùng: `images/logo-mark.png` (PNG đã **tách nền**, alpha = độ sáng, cắt sát viền) làm **`mask`**, tô `background-color: var(--ink)` → tự đổi màu theo theme, 1 asset, sắc nét; `180×70px`. Nguồn mask: `images/logo-black.jpg` qua script tách nền + cắt ngưỡng.
+> Khi chốt logo, đổi trang con sang `.brand-logo` (thêm size cho topbar gọn) rồi bỏ `.brand` equalizer.
 
 ### 7.2 Topbar (trang con)
 `position: fixed`, flex space-between, trong suốt; khi cuộn > 40px JS thêm class `.is-scrolled` → nền `color-mix(bg 82%, transparent)` + `backdrop-filter: blur(10px)` + viền dưới `--line`.
@@ -248,7 +252,7 @@ Pill giữa đáy màn hình, đảo màu (`background: var(--ink); color: var(-
 Khối gradient `linear-gradient(120deg, var(--accent), var(--accent-2))`, radius 24px, chữ màu `--bg` (đảo), nút bên trong đảo tiếp (`background: var(--bg); color: var(--ink)`).
 
 ### 7.17 Footer
-Viền trên `--line`, Condensed 12px uppercase `letter-spacing: .14em`, màu `--muted`, căn giữa: `© 2026 SSD — Studio of Smile Design`.
+Viền trên `--line`, Condensed 12px uppercase `letter-spacing: .14em`, màu `--muted`, căn giữa: `© 2026 Dr. Đỗ Long — Chuyên khoa Sâu răng · Phục hình · Nội nha`.
 
 ### 7.18 Subhero (hero chuẩn cho trang phụ)
 `.subhero` (trong BASE + SHARED): `padding: 150px 0 40px`, căn giữa; chứa breadcrumb (tự căn giữa) → `.eyebrow` → `h1` (Condensed 600, `clamp(44px, 8vw, 110px)`) → `.hero-lead`. Mọi trang phụ mới dùng component này thay vì tự chế hero.
@@ -316,14 +320,14 @@ Menu vòng cung ở landing trỏ tới 5 trang chính (Về chúng tôi · Gi�
          → fonts.css → css/style.css (file CSS DUY NHẤT của cả site)
    (KHÔNG dùng <style> hay <script> inline; <body class="page-<slug>"> để scope CSS/JS riêng của trang)
 └─ body
-   ├─ header.topbar  (brand equalizer + SSD, theme-toggle)
+   ├─ header.topbar  (brand logo ảnh `.brand-logo`, theme-toggle)
    ├─ main
    │   ├─ section.hero        (breadcrumb → eyebrow/h1 → lead → [cta, stats])
    │   ├─ section minh hoạ    (before/after HOẶC slider quy trình HOẶC gallery)
    │   ├─ section.section     (sec-head + .cards)
    │   ├─ section.faq         (details/summary) [tuỳ chọn]
    │   └─ section CTA         (.cta nút đơn HOẶC .band gradient)
-   └─ footer (© 2026 SSD — Studio of Smile Design)
+   └─ footer (© 2026 Dr. Đỗ Long — Chuyên khoa Sâu răng · Phục hình · Nội nha)
    └─ cuối body: [vendor nếu trang cần] → <script src="assets/js/main.js">
 ```
 
@@ -361,6 +365,11 @@ Liên kết về từ menu vòng cung trong `landing-1.html` (thêm `.spoke` m�
 7. ✅ **Đặt lại toàn bộ class theo quy ước mục 7.0** (đổi đồng bộ CSS + HTML + JS): state dùng `is-*` (`is-active`, `is-scrolled`, `is-visible`, `is-on`, `is-current`, `is-disabled`, `is-panel-open`, `is-pos-editing`, `is-dial-dragging`); bỏ viết tắt (`.kk`→`.kicker`, `.ba-*`→`.compare-*`, `.bcard`→`.benefit-card`, `.bgrid`→`.benefit-grid`, `.ic`→`.benefit-icon`, `.viz`→`.process-viz`, `.cap`→`.slide-caption`, `.no`→`.step-no`, `.pl`→`.faq-plus`, `.d`→`.dot`, `.pg-*`→`.pagination-*`, `.more`→`.post-more`, `.x`→`.panel-close-x`, `.lead`/`.sub`→`.hero-lead`, `.s1/s2/s3`→`.slide-1/2/3`, `.inner`→`.band-inner`, `.copy`→`.copyright`, `.head`/`h2.sec`→`.sec-head`). ID và `data-*` giữ nguyên.
 
 8. ✅ **Tách toàn bộ JS ra file riêng** — không còn `<script>` inline: `assets/js/head.js` (chống FOUC, load chặn trong `<head>`) + `assets/js/main.js` (toàn bộ logic, chia section SHARED / LANDING / NIỀNG RĂNG / CẠO VÔI RĂNG, gate bằng `body.classList.contains("page-<slug>")` để code trang này không chạy nhầm trên trang khác).
+
+9. ✅ **Đổi thương hiệu → Dr. Đỗ Long** (BS CK2 Đỗ Thái Long), định vị *Chuyên khoa Sâu răng · Phục hình · Nội nha*; bỏ hẳn tên "SSD / Studio of Smile Design" khỏi UI (giữ cho câu văn cảnh dùng đúng: *người* = Dr. Đỗ (Thái) Long, không quy công ca điều trị cho "studio").
+10. ✅ **Logo ảnh** `.brand-logo` (mask `logo-mark.png` đã tách nền, tô `var(--ink)`) — **hiện chỉ áp ở landing**; trang con vẫn giữ equalizer + chữ cho tới khi chốt logo chính thức.
+11. ✅ **Dọn dead code sau khi menu landing trỏ ra 5 trang riêng**: xoá 6 `<section class="panel">` mồ côi + `.panel-close` khỏi `landing-1.html`; gỡ toàn bộ logic panel (openPanel/closePanel, handler `a[href^="#"]`, is-panel-open) khỏi `main.js`; xoá CSS `.panel*`, `.contact-row`, `.copyright`, `is-panel-open`, `is-current` khỏi `style.css` (giữ `.blog-*/.post-*/.pagination-*` vì `kien-thuc-y-khoa` dùng). Thêm `<h1 class="visually-hidden">` ở landing.
+12. ✅ **Gỡ vendor thừa**: `landing-1` không nạp `ScrollTrigger`/`Lenis` nữa (main.js không dùng); xoá `assets/vendor/three.min.js` (không trang nào nạp); xoá ảnh mồ côi `images/background.webp`.
 
 **Quy tắc từ nay:**
 - Trang mới KHÔNG viết `<style>` hay `<script>` inline — link `assets/css/style.css` + `assets/js/head.js` (head) + `assets/js/main.js` (cuối body), thêm `class="page-<slug>"` vào `<body>`.
