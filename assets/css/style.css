@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SSD — Studio of Smile Design · style.css (toàn bộ CSS của site)
+   Dr. Đỗ Long — Nha khoa chuyên khoa · style.css (toàn bộ CSS của site)
    Nguồn sự thật: design-system/MASTER.md
    Cấu trúc:
      1. TOKENS          — biến màu dark/light
@@ -36,7 +36,7 @@
     linear-gradient(180deg, rgba(6,6,9,.60) 0%, rgba(6,6,9,.26) 40%, rgba(11,11,13,.86) 100%);
 
   /* --- menu vòng cung (landing) --- */
-  --radius-arc: 92px;           /* khoảng cách từ tâm mặt số tới chữ */
+  --radius-arc: 112px;          /* khoảng cách từ tâm mặt số tới chữ */
   --pivot-x: 78px;              /* vị trí tâm mặt số theo trục X */
   --pivot-y: 96px;              /* vị trí tâm mặt số theo trục Y (tính từ đáy) */
 }
@@ -319,8 +319,14 @@ html.is-dial-dragging .spoke,html.is-dial-dragging .dial-lens{will-change:transf
   transform-origin:left center;
   transform:rotate(var(--deg));
   white-space:nowrap;
-  transition:left .45s cubic-bezier(.2,.7,.2,1), right .45s cubic-bezier(.2,.7,.2,1);
+  transition:left .45s cubic-bezier(.2,.7,.2,1), right .45s cubic-bezier(.2,.7,.2,1),
+             opacity .35s ease, visibility .75s;
+  /* menu ĐÓNG mặc định — click mặt số để mở/đóng (html.is-menu-open).
+     visibility .75s = đợi animation gập của GSAP (~.74s) chạy TRỌN rồi mới ẩn hẳn */
+  opacity:0;visibility:hidden;pointer-events:none;
 }
+html.is-menu-open .spoke{opacity:1;visibility:visible;pointer-events:auto}
+html:not(.has-js) .spoke{opacity:1;visibility:visible;pointer-events:auto}  /* không JS → menu luôn mở */
 .spoke a{
   display:inline-block;
   padding-left:var(--radius-arc);
@@ -341,6 +347,24 @@ html.is-dial-dragging .spoke,html.is-dial-dragging .dial-lens{will-change:transf
   transform:translateY(-50%) scale(.6);opacity:.5;transition:.3s;
 }
 .spoke a:hover::before{background:var(--fg);opacity:1;transform:translateY(-50%) scale(1)}
+
+/* vạch chia nhỏ giữa các mục menu — kéo được để xoay dial như mặt số */
+.spoke-tick{pointer-events:none}   /* chỉ vùng vạch (i) bắt pointer, không phải cả nan */
+.spoke-tick i{
+  /* vùng chạm là dải ~86×30px chạy DỌC theo khe trống giữa 2 label
+     (kéo dài theo tia thì không đụng chữ; phình ngang mới đụng) */
+  display:inline-block;padding:14px 34px;
+  margin-left:calc(var(--radius-arc) + 2px);              /* vạch nằm giữa thân 2 dòng chữ, không dính ký tự đầu */
+  pointer-events:auto;cursor:grab;touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.spoke-tick i::before{
+  content:"";display:block;width:18px;height:1.5px;border-radius:1px;
+  background:color-mix(in srgb, var(--muted) 75%, transparent);
+  transition:background-color .3s;
+}
+.spoke-tick i:hover::before{background:var(--fg)}
+html.is-dial-dragging .spoke-tick i{cursor:grabbing}
 
 /* ============ Blog / Kiến thức: danh sách bài viết (dùng ở kien-thuc-y-khoa) ============ */
 .blog-grid{
@@ -408,20 +432,20 @@ html.is-dial-dragging .spoke,html.is-dial-dragging .dial-lens{will-change:transf
 .pagination .pagination-btn.is-disabled:hover{border-color:var(--line);color:var(--muted)}
 
 /* ============ Trạng thái ban đầu cho GSAP (chỉ khi có JS, chỉ landing) ============ */
-.has-js .spoke,
+/* (.spoke không nằm ở đây nữa — ẩn/hiện do trạng thái menu is-menu-open quản) */
 .has-js .dial-lens,
 .has-js .page-landing .brand,
 .has-js .page-landing .theme-toggle{opacity:0}
 /* tôn trọng người tắt hiệu ứng */
 @media (prefers-reduced-motion: reduce){
-  .has-js .spoke,.has-js .dial-lens,.has-js .page-landing .brand,
+  .has-js .dial-lens,.has-js .page-landing .brand,
   .has-js .page-landing .theme-toggle{opacity:1}
   .dial-lens .rot,.dial-lens .rot-rev,.dial-lens .arc-spin,.dial-lens .arc-spin2,.brand span{animation:none}
 }
 
 /* ============ Responsive (landing) ============ */
 @media (max-width:640px){
-  :root{--radius-arc:76px;--pivot-x:60px;--pivot-y:74px}
+  :root{--radius-arc:92px;--pivot-x:60px;--pivot-y:74px}
   .spoke a{font-size:12px;letter-spacing:.1em}
   .dial-lens{width:96px;height:96px;left:calc(var(--pivot-x) - 48px);bottom:calc(var(--pivot-y) - 48px)}
 
@@ -439,6 +463,7 @@ html.is-dial-dragging .spoke,html.is-dial-dragging .dial-lens{will-change:transf
   html[data-pos="right"] .spoke a{padding-left:0;padding-right:var(--radius-arc)}
   html[data-pos="right"] .spoke a::before{left:auto;right:calc(var(--radius-arc) - 14px)}
   html[data-pos="right"] .spoke a:hover{padding-left:0;padding-right:calc(var(--radius-arc) + 12px)}
+  html[data-pos="right"] .spoke-tick i{margin-left:0;margin-right:calc(var(--radius-arc) + 2px)}
 }
 
 /* ==========================================================================

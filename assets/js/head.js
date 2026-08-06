@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SSD · head.js — PHẢI load KHÔNG defer/async trong <head> (chặn render)
+   Dr. Đỗ Long · head.js — PHẢI load KHÔNG defer/async trong <head> (chặn render)
    Chống FOUC: đánh dấu có JS + áp theme/vị trí menu đã lưu TRƯỚC khi vẽ trang.
    ========================================================================== */
 document.documentElement.classList.add("has-js");

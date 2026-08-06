@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SSD — Studio of Smile Design · main.js (toàn bộ JS của site)
+   Dr. Đỗ Long — Nha khoa chuyên khoa · main.js (toàn bộ JS của site)
    Load ở cuối <body>, SAU các file vendor (gsap...) nếu trang cần.
    Cấu trúc:
      1. SHARED   — chạy mọi trang (theme toggle, topbar cuộn, compare slider)
@@ -153,6 +153,8 @@ if (document.body.classList.contains("page-landing")) {
 
     let targetRot = 0, rot = 0, prevTarget = 0, vel = 0;
     let dragging = false, lastAng = 0, running = false, raf = 0;
+    let movedDeg = 0, pressEl = null;      // phân biệt CLICK (toggle menu) với KÉO (xoay)
+    let menuOpen = false;
 
     const center = () => {
       const r = lens.getBoundingClientRect();
@@ -194,19 +196,58 @@ if (document.body.classList.contains("page-landing")) {
     }
     function start() { if (!running) { running = true; prevTarget = targetRot; raf = requestAnimationFrame(loop); } }
 
-    lens.addEventListener("pointerdown", (e) => {
+    /* ---- Mở / đóng menu khi CLICK mặt số ---- */
+    function setMenu(open) {
+      menuOpen = open;
+      root.classList.toggle("is-menu-open", open);
+      lens.setAttribute("aria-expanded", String(open));
+      // không GSAP / tắt hiệu ứng → CSS transition (opacity/visibility) tự lo
+      if (!window.gsap || reduce) return;
+      // mặt số "nhún" nhẹ xác nhận cú bấm (animate svg con, không đụng transform
+      // của .dial-lens vì render() đang ghi rotate lên đó)
+      gsap.fromTo(lens.querySelector("svg"),
+        { scale: .93, transformOrigin: "50% 50%" },
+        { scale: 1, duration: .45, ease: "back.out(2.2)", overwrite: "auto" });
+      const m = isMirror();
+      spokes.forEach((s, i) => {
+        const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
+        const target = (m ? -deg : deg) + rot;           // giữ nguyên góc dial đang xoay
+        if (open) {
+          gsap.fromTo(s,
+            { opacity: 0, rotation: target - 9 },
+            { opacity: 1, rotation: target, duration: .55, ease: "power3.out", delay: i * .04, overwrite: "auto" });
+        } else {
+          // gập về phía mặt số: xoay sâu hơn + chậm hơn, gia tốc dần (power3.in)
+          // → khớp cửa sổ visibility .75s bên CSS, không bị cắt ngang
+          gsap.to(s, {
+            opacity: 0, rotation: target - 12, duration: .5, ease: "power3.in",
+            delay: (spokes.length - 1 - i) * .03, overwrite: "auto",
+            onComplete: () => { s.style.transform = "rotate(" + target + "deg)"; }
+          });
+        }
+      });
+    }
+
+    // kéo được từ mặt số HOẶC từ các vạch chia trên menu — cùng một cơ chế,
+    // tâm xoay luôn là tâm mặt số (angle() tính theo lens)
+    function grab(e) {
       dragging = true;
-      try { lens.setPointerCapture(e.pointerId); } catch (_) {}
+      pressEl = e.currentTarget; movedDeg = 0;
+      try { pressEl.setPointerCapture(e.pointerId); } catch (_) {}
       lastAng = angle(e.clientX, e.clientY);
       vel = 0; prevTarget = targetRot;
       root.classList.add("is-dial-dragging");
       e.preventDefault();
       start();
-    });
+    }
+    lens.addEventListener("pointerdown", grab);
+    document.querySelectorAll(".spoke-tick i").forEach((t) => t.addEventListener("pointerdown", grab));
     window.addEventListener("pointermove", (e) => {
       if (!dragging) return;
       const a = angle(e.clientX, e.clientY);
-      targetRot += norm(a - lastAng);     // chỉ cập nhật đích, render để loop lo
+      const d = norm(a - lastAng);
+      movedDeg += Math.abs(d);            // cộng dồn để biết đây là kéo hay chỉ là click
+      targetRot += d;                     // chỉ cập nhật đích, render để loop lo
       lastAng = a;
       start();
     });
@@ -214,39 +255,32 @@ if (document.body.classList.contains("page-landing")) {
       if (!dragging) return;
       dragging = false;
       root.classList.remove("is-dial-dragging");
+      // gần như không xoay (< 3°) và bấm vào mặt số → tính là CLICK: toggle menu
+      if (movedDeg < 3 && pressEl === lens) setMenu(!menuOpen);
       start();                            // loop tiếp tục chạy quán tính
     }
     window.addEventListener("pointerup", release);
     window.addEventListener("pointercancel", release);
+
+    // bàn phím: Enter / Space trên mặt số cũng toggle menu
+    lens.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setMenu(!menuOpen); }
+    });
   })();
 
-  /* ---- Intro khi tải: logo, mặt số, MENU XOÈ RA (menu trỏ ra các trang riêng) ---- */
+  /* ---- Intro khi tải: logo + mặt số (menu ĐÓNG sẵn — click mặt số để xoè) ---- */
   if (!window.gsap) {
-    // Không có thư viện → hiện logo + menu ngay (spoke là link .html, điều hướng bình thường)
+    // Không có thư viện → hiện logo + toàn bộ menu luôn (CSS html:not(.has-js) lo phần spoke)
     document.documentElement.classList.remove("has-js");
+  } else if (reduce) {
+    gsap.set([".brand", ".theme-toggle", ".dial-lens"], { opacity: 1 });
   } else {
-    const spokes = gsap.utils.toArray(".spoke");
-    if (reduce) {
-      gsap.set([".brand", ".theme-toggle", ".dial-lens"], { opacity: 1 });
-      spokes.forEach((s) => {
-        const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
-        gsap.set(s, { opacity: 1, rotation: deg, transformOrigin: "left center" });
-      });
-    } else {
-      const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-      intro
-        .to([".brand", ".theme-toggle"], { opacity: 1, duration: .8, stagger: .1 })
-        .fromTo(".dial-lens",
-          { opacity: 0, scale: .5, transformOrigin: "50% 50%" },
-          { opacity: 1, scale: 1, duration: 1 }, "-=.4");
-      spokes.forEach((s, i) => {
-        const deg = parseFloat(s.style.getPropertyValue("--deg")) || 0;
-        intro.fromTo(s,
-          { opacity: 0, rotation: -1, transformOrigin: "left center" },
-          { opacity: 1, rotation: deg, duration: .7 }, .5 + i * .08);
-        gsap.from(s.querySelector("a"), { x: -22, duration: .7, ease: "power3.out", delay: .5 + i * .08 });
-      });
-    }
+    const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+    intro
+      .to([".brand", ".theme-toggle"], { opacity: 1, duration: .8, stagger: .1 })
+      .fromTo(".dial-lens",
+        { opacity: 0, scale: .5, transformOrigin: "50% 50%" },
+        { opacity: 1, scale: 1, duration: 1 }, "-=.4");
   }
 }
 

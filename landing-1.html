@@ -49,10 +49,10 @@
     <h1 class="visually-hidden">Dr. Đỗ Long — Bác sĩ chuyên khoa Sâu răng · Phục hình · Nội nha</h1>
   </header>
 
-  <!-- MẶT SỐ / ỐNG KÍNH -->
-  <div class="dial" aria-hidden="true">
-    <div class="dial-lens">
-      <svg viewBox="0 0 124 124" fill="none" stroke="currentColor">
+  <!-- MẶT SỐ / ỐNG KÍNH — click để mở/đóng menu, kéo để xoay -->
+  <div class="dial">
+    <div class="dial-lens" role="button" tabindex="0" aria-label="Mở / đóng menu" aria-expanded="false" aria-controls="mainmenu">
+      <svg viewBox="0 0 124 124" fill="none" stroke="currentColor" aria-hidden="true">
         <circle cx="62" cy="62" r="61" stroke-opacity=".14"/>
         <circle cx="62" cy="62" r="46" stroke-opacity=".22"/>
         <g class="rot">
@@ -92,10 +92,15 @@
 
   <!-- MENU VÒNG CUNG -->
   <nav class="arc" id="mainmenu" aria-label="Menu chính">
-    <div class="spoke" style="--deg:-60deg"><a href="ve-chung-toi.html">Về Dr. Đỗ Thái Long</a></div>
-    <div class="spoke" style="--deg:-46deg"><a href="giai-phap-dieu-tri.html">Giải pháp điều trị</a></div>
-    <div class="spoke" style="--deg:-32deg"><a href="ca-dieu-tri.html">Ca điều trị</a></div>
-    <div class="spoke" style="--deg:-18deg"><a href="kien-thuc-y-khoa.html">Kiến thức y khoa</a></div>
+    <!-- .spoke-tick: vạch chia nằm GIỮA 2 mục (cách đều 9°), kéo được để xoay dial -->
+    <div class="spoke" style="--deg:-76deg"><a href="ve-chung-toi.html">Về Dr. Đỗ Thái Long</a></div>
+    <div class="spoke spoke-tick" style="--deg:-67deg" aria-hidden="true"><i></i></div>
+    <div class="spoke" style="--deg:-58deg"><a href="giai-phap-dieu-tri.html">Giải pháp điều trị</a></div>
+    <div class="spoke spoke-tick" style="--deg:-49deg" aria-hidden="true"><i></i></div>
+    <div class="spoke" style="--deg:-40deg"><a href="ca-dieu-tri.html">Ca điều trị</a></div>
+    <div class="spoke spoke-tick" style="--deg:-31deg" aria-hidden="true"><i></i></div>
+    <div class="spoke" style="--deg:-22deg"><a href="kien-thuc-y-khoa.html">Kiến thức y khoa</a></div>
+    <div class="spoke spoke-tick" style="--deg:-13deg" aria-hidden="true"><i></i></div>
     <div class="spoke" style="--deg:-4deg"><a href="lien-he.html">Liên hệ tư vấn</a></div>
   </nav>
 
