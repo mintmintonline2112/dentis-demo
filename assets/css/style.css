@@ -102,6 +102,15 @@ a{color:inherit;text-decoration:none}
 .brand b{margin-left:12px;font-weight:600;letter-spacing:.28em;font-size:14px}
 @keyframes eq{0%,100%{transform:scaleY(.7)}50%{transform:scaleY(1)}}
 
+/* ----- Logo thương hiệu: PNG đã tách nền → dùng làm mask, tô màu theo theme ----- */
+.brand-logo{
+  width:180px;height:70px;
+  background-color:var(--ink);                          /* logo lấy màu chữ theme: trắng ở Dark, đen ở Light */
+  -webkit-mask:url("../../images/logo-mark.png") left center / contain no-repeat;
+          mask:url("../../images/logo-mark.png") left center / contain no-repeat;
+}
+.brand-logo span{display:none}
+
 /* ----- Theme toggle (sun / moon) ----- */
 .theme-toggle{
   position:relative;width:26px;height:26px;padding:0;
@@ -223,7 +232,7 @@ body.page-landing{
 }
 
 /* ============ LOGO + nút theme: landing ghim góc, cỡ lớn hơn ============ */
-.page-landing .brand{position:fixed;top:26px;left:30px;z-index:40;height:44px}
+.page-landing .brand{position:fixed;top:24px;left:30px;z-index:40;height:70px}
 .page-landing .brand span{width:4px}
 .page-landing .theme-toggle{position:fixed;top:26px;right:32px;z-index:40;width:30px;height:30px;opacity:.8}
 
