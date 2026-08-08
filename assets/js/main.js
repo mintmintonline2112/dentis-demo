@@ -74,6 +74,140 @@
 if (document.body.classList.contains("page-landing")) {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* ---- Menu cấp 2: dữ liệu dùng chung cho panel desktop / bottom sheet mobile ---- */
+  (function () {
+    const root = document.documentElement;
+    const panel = document.getElementById("submenu-panel");
+    const backdrop = document.getElementById("submenu-backdrop");
+    const title = document.getElementById("submenu-title");
+    const overview = document.getElementById("submenu-overview");
+    const list = document.getElementById("submenu-list");
+    const closeBtn = panel && panel.querySelector(".submenu-close");
+    const triggers = [].slice.call(document.querySelectorAll("[data-submenu]"));
+    if (!panel || !backdrop || !title || !overview || !list || !closeBtn) return;
+
+    const MENU_ITEMS = {
+      about: {
+        title: "Về Dr. Đỗ Thái Long",
+        overview: "ve-chung-toi.html",
+        children: [
+          { label: "Chứng chỉ / đào tạo", href: "ve-chung-toi.html#chung-chi-dao-tao" },
+          { label: "Hành trình phát triển", href: "ve-chung-toi.html#hanh-trinh-phat-trien" },
+          { label: "Nội dung chuyên môn", href: "ve-chung-toi.html#noi-dung-chuyen-mon" }
+        ]
+      },
+      solutions: {
+        title: "Giải pháp điều trị",
+        overview: "giai-phap-dieu-tri.html",
+        children: [
+          { label: "Veneer", href: "giai-phap-dieu-tri.html#veneer" },
+          { label: "Inlay / Onlay", href: "giai-phap-dieu-tri.html#inlay-onlay" },
+          { label: "Nội nha", href: "giai-phap-dieu-tri.html#noi-nha" }
+        ]
+      },
+      cases: {
+        title: "Ca điều trị",
+        overview: "ca-dieu-tri.html",
+        children: [
+          { label: "Ca Veneer", href: "ca-dieu-tri.html#veneer" },
+          { label: "Ca Inlay / Onlay", href: "ca-dieu-tri.html#inlay-onlay" },
+          { label: "Ca Nội nha", href: "ca-dieu-tri.html#noi-nha" }
+        ]
+      },
+      knowledge: {
+        title: "Kiến thức nha khoa",
+        overview: "kien-thuc-y-khoa.html",
+        children: [
+          { label: "Bài viết về Veneer", href: "kien-thuc-y-khoa.html#veneer" },
+          { label: "Bài viết về Inlay / Onlay", href: "kien-thuc-y-khoa.html#inlay-onlay" },
+          { label: "Bài viết về Nội nha", href: "kien-thuc-y-khoa.html#noi-nha" }
+        ]
+      }
+    };
+
+    let activeKey = null;
+    let activeTrigger = null;
+
+    function renderChildren(children) {
+      list.replaceChildren();
+      children.forEach((item, index) => {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        const no = document.createElement("span");
+        const label = document.createElement("span");
+        const arrow = document.createElement("span");
+
+        link.href = item.href;
+        no.className = "submenu-item-no";
+        no.textContent = String(index + 1).padStart(2, "0");
+        label.textContent = item.label;
+        arrow.className = "submenu-item-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+
+        link.append(no, label, arrow);
+        li.appendChild(link);
+        list.appendChild(li);
+      });
+    }
+
+    function closeSubmenu(returnFocus) {
+      const focusTarget = activeTrigger;
+      activeKey = null;
+      activeTrigger = null;
+      root.classList.remove("is-submenu-open");
+      panel.setAttribute("aria-hidden", "true");
+      backdrop.setAttribute("aria-hidden", "true");
+      triggers.forEach((trigger) => {
+        trigger.classList.remove("is-active");
+        trigger.setAttribute("aria-expanded", "false");
+      });
+      if (returnFocus && focusTarget) focusTarget.focus();
+    }
+
+    function openSubmenu(key, trigger) {
+      const item = MENU_ITEMS[key];
+      if (!item) return;
+      if (activeKey === key && root.classList.contains("is-submenu-open")) {
+        closeSubmenu(true);
+        return;
+      }
+
+      activeKey = key;
+      activeTrigger = trigger;
+      title.textContent = item.title;
+      overview.href = item.overview;
+      overview.setAttribute("aria-label", "Xem tổng quan " + item.title);
+      renderChildren(item.children);
+
+      triggers.forEach((itemTrigger) => {
+        const active = itemTrigger === trigger;
+        itemTrigger.classList.toggle("is-active", active);
+        itemTrigger.setAttribute("aria-expanded", String(active));
+      });
+      panel.setAttribute("aria-hidden", "false");
+      backdrop.setAttribute("aria-hidden", "false");
+      root.classList.add("is-submenu-open");
+    }
+
+    triggers.forEach((trigger) => trigger.addEventListener("click", (event) => {
+      // Giữ hành vi link chuẩn cho Ctrl/Cmd/Shift click và khi JS bị tắt.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      openSubmenu(trigger.dataset.submenu, trigger);
+    }));
+
+    closeBtn.addEventListener("click", () => closeSubmenu(true));
+    backdrop.addEventListener("click", () => closeSubmenu(false));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && root.classList.contains("is-submenu-open")) {
+        event.preventDefault();
+        closeSubmenu(true);
+      }
+    });
+    document.addEventListener("dentis:main-menu-close", () => closeSubmenu(false));
+  })();
+
   /* ---- Vị trí menu (MOBILE): bấm điểm chọn để đặt menu, bấm Save để lưu ---- */
   (function () {
     const root = document.documentElement;
@@ -201,6 +335,7 @@ if (document.body.classList.contains("page-landing")) {
       menuOpen = open;
       root.classList.toggle("is-menu-open", open);
       lens.setAttribute("aria-expanded", String(open));
+      if (!open) document.dispatchEvent(new CustomEvent("dentis:main-menu-close"));
       // không GSAP / tắt hiệu ứng → CSS transition (opacity/visibility) tự lo
       if (!window.gsap || reduce) return;
       // mặt số "nhún" nhẹ xác nhận cú bấm (animate svg con, không đụng transform

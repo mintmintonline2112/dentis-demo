@@ -93,16 +93,34 @@
   <!-- MENU VÒNG CUNG -->
   <nav class="arc" id="mainmenu" aria-label="Menu chính">
     <!-- .spoke-tick: vạch chia nằm GIỮA 2 mục (cách đều 9°), kéo được để xoay dial -->
-    <div class="spoke" style="--deg:-76deg"><a href="ve-chung-toi.html">Về Dr. Đỗ Thái Long</a></div>
+    <div class="spoke" style="--deg:-76deg"><a class="arc-item" href="ve-chung-toi.html" data-submenu="about" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-panel">Về Dr. Đỗ Thái Long</a></div>
     <div class="spoke spoke-tick" style="--deg:-67deg" aria-hidden="true"><i></i></div>
-    <div class="spoke" style="--deg:-58deg"><a href="giai-phap-dieu-tri.html">Giải pháp điều trị</a></div>
+    <div class="spoke" style="--deg:-58deg"><a class="arc-item" href="giai-phap-dieu-tri.html" data-submenu="solutions" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-panel">Giải pháp điều trị</a></div>
     <div class="spoke spoke-tick" style="--deg:-49deg" aria-hidden="true"><i></i></div>
-    <div class="spoke" style="--deg:-40deg"><a href="ca-dieu-tri.html">Ca điều trị</a></div>
+    <div class="spoke" style="--deg:-40deg"><a class="arc-item" href="ca-dieu-tri.html" data-submenu="cases" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-panel">Ca điều trị</a></div>
     <div class="spoke spoke-tick" style="--deg:-31deg" aria-hidden="true"><i></i></div>
-    <div class="spoke" style="--deg:-22deg"><a href="kien-thuc-y-khoa.html">Kiến thức y khoa</a></div>
+    <div class="spoke" style="--deg:-22deg"><a class="arc-item" href="kien-thuc-y-khoa.html" data-submenu="knowledge" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-panel">Kiến thức nha khoa</a></div>
     <div class="spoke spoke-tick" style="--deg:-13deg" aria-hidden="true"><i></i></div>
-    <div class="spoke" style="--deg:-4deg"><a href="lien-he.html">Liên hệ tư vấn</a></div>
+    <div class="spoke" style="--deg:-4deg"><a class="arc-item" href="lien-he.html">Liên hệ</a></div>
   </nav>
+
+  <!-- MENU CẤP 2 — desktop: panel bên phải; mobile: bottom sheet -->
+  <div class="submenu-backdrop" id="submenu-backdrop" aria-hidden="true"></div>
+  <section class="submenu-panel" id="submenu-panel" aria-labelledby="submenu-title" aria-hidden="true">
+    <div class="submenu-head">
+      <span class="submenu-kicker">Danh mục</span>
+      <button class="submenu-close" type="button" aria-label="Đóng menu cấp hai">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+    </div>
+    <a class="submenu-overview" id="submenu-overview" href="ve-chung-toi.html">
+      <h2 id="submenu-title">Về Dr. Đỗ Thái Long</h2>
+      <span>Xem trang tổng quan <b aria-hidden="true">↗</b></span>
+    </a>
+    <ul class="submenu-list" id="submenu-list"></ul>
+  </section>
 
 
   <!-- ============ Thư viện hiệu ứng ============ -->
